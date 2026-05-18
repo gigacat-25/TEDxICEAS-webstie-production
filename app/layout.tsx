@@ -7,7 +7,6 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ThemeProvider } from "./components/ThemeContext";
 import { venue, event } from "@/lib/venue";
 import ParticleCanvas from "./components/hero/ParticleCanvas";
-import MosaicFloatingButton from "./components/chat/MosaicFloatingButton";
 // Initialize Orbitron
 const orbitron = Orbitron({
   subsets: ["latin"],
@@ -107,7 +106,6 @@ export default function RootLayout({
         <ThemeProvider>
           <ParticleCanvas />
           {children}
-          <MosaicFloatingButton />
         </ThemeProvider>
         <Analytics />
         <SpeedInsights />
