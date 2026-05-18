@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 700" fill="none">
+  <defs>
+    <linearGradient id="light" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="60%" stop-color="#F0EFEA"/>
+      <stop offset="100%" stop-color="#D4D2CC"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Top Crown -->
+  <polygon points="185,45 215,65 220,110 170,90 115,115" fill="#F5F4F0"/>
+  <polygon points="170,90 220,110 195,100 145,100 115,115" fill="#EDECE7"/>
+  <polygon points="115,115 145,100 195,100 155,130" fill="#E6E5DF"/>
+
+  <!-- Upper Back Head -->
+  <polygon points="155,130 195,100 220,110 210,150 180,145" fill="#E0DED8"/>
+  <polygon points="115,115 155,130 180,145 140,160" fill="#D9D7D0"/>
+  <polygon points="140,160 180,145 210,150 195,195 160,190" fill="#D4D2CB"/>
+  <polygon points="160,190 195,195 205,220 175,215 135,210" fill="#CCCAC2"/>
+
+  <!-- Forehead -->
+  <polygon points="210,150 220,110 275,145 265,180" fill="#F0EFEA"/>
+  <polygon points="265,180 275,145 295,185 280,215" fill="#E8E7E1"/>
+  <polygon points="210,150 265,180 240,190 195,195" fill="#EBEAE4"/>
+
+  <!-- Brow & Eye -->
+  <polygon points="240,190 265,180 280,215 255,225 225,220" fill="#E2E0DA"/>
+  <polygon points="225,220 255,225 270,255 240,260 210,250" fill="#DCDAD3"/>
+  <polygon points="175,215 205,220 225,220 210,250 185,245" fill="#D5D3CC"/>
+  <polygon points="135,210 175,215 185,245 155,240" fill="#CECCC4"/>
+
+  <!-- Nose Bridge -->
+  <polygon points="240,260 270,255 290,280 265,290" fill="#D6D4CD"/>
+  <polygon points="210,250 240,260 265,290 235,295" fill="#D0CEC6"/>
+  <polygon points="185,245 210,250 235,295 210,285" fill="#C9C7BF"/>
+
+  <!-- Nose Tip -->
+  <polygon points="265,290 290,280 320,295 305,315" fill="#CCCAC2"/>
+  <polygon points="235,295 265,290 305,315 280,320" fill="#C5C3BB"/>
+  <polygon points="305,315 320,295 355,310 340,330" fill="#C8C6BE"/>
+  <polygon points="280,320 305,315 340,330 320,340" fill="#C0BEB5"/>
+
+  <!-- Under Nose & Upper Lip -->
+  <polygon points="280,320 320,340 345,365 310,365" fill="#C3C1B9"/>
+  <polygon points="265,325 280,320 310,365 295,350" fill="#BDBBB2"/>
+  <polygon points="310,365 345,365 335,385 300,380" fill="#BFBDB4"/>
+
+  <!-- Mouth -->
+  <polygon points="295,380 300,395 325,405 310,385 335,385" fill="#B8B6AD"/>
+  <polygon points="285,395 295,380 300,380 310,385" fill="#B3B1A8"/>
+
+  <!-- Lower Lip & Chin -->
+  <polygon points="300,395 325,405 340,430 315,430" fill="#BAB8AF"/>
+  <polygon points="285,400 300,395 315,430 300,440" fill="#B5B3AA"/>
+  <polygon points="315,430 340,430 345,465 320,465" fill="#B0AEA4"/>
+  <polygon points="300,440 315,430 320,465 305,475" fill="#ACA99F"/>
+  <polygon points="305,475 320,465 325,500 295,510" fill="#A7A499"/>
+
+  <!-- Jaw & Neck Front -->
+  <polygon points="295,510 325,500 310,550 285,540" fill="#A2A094"/>
+  <polygon points="285,540 310,550 295,600 270,585" fill="#9C998D"/>
+  <polygon points="270,585 295,600 280,650 255,635" fill="#969387"/>
+  <polygon points="255,635 280,650 260,670 235,655" fill="#908D80"/>
+
+  <!-- Back Neck -->
+  <polygon points="140,160 160,190 135,210 110,185" fill="#CECCC4"/>
+  <polygon points="155,240 185,245 210,285 180,280" fill="#C2C0B7"/>
+  <polygon points="180,280 210,285 235,295 265,325 220,320" fill="#BBB9B0"/>
+  <polygon points="135,210 155,240 180,280 160,270 120,240" fill="#C6C4BB"/>
+  <polygon points="120,240 160,270 180,280 220,320 200,315 155,300" fill="#BDBBB2"/>
+
+  <!-- Lower Neck & Back -->
+  <polygon points="220,320 265,325 295,350 280,380 240,360" fill="#B5B3AA"/>
+  <polygon points="240,360 280,380 295,380 285,440 260,420" fill="#ADABA1"/>
+  <polygon points="200,315 220,320 240,360 260,420 240,410 210,370" fill="#A8A599"/>
+  <polygon points="155,300 200,315 210,370 195,365 165,340" fill="#B0AEA4"/>
+  <polygon points="165,340 195,365 210,370 240,410 230,405 200,390" fill="#A7A499"/>
+  <polygon points="200,390 230,405 240,410 260,420 285,440 280,470 250,455" fill="#A09D91"/>
+  <polygon points="250,455 280,470 285,440 300,440 305,475 295,510 270,490" fill="#9B988C"/>
+  <polygon points="270,490 295,510 285,540 270,585 255,565 260,530" fill="#969387"/>
+  <polygon points="260,530 255,565 270,585 255,635 240,610 245,570" fill="#908D80"/>
+  <polygon points="245,570 240,610 255,635 235,655 220,630 225,590" fill="#8A877A"/>
+  <polygon points="225,590 220,630 235,655 210,660 195,635 200,600" fill="#848174"/>
+  <polygon points="200,600 195,635 210,660 180,655 170,630 175,595" fill="#7E7B6D"/>
+  <polygon points="175,595 170,630 180,655 150,640 145,610 155,580" fill="#787567"/>
+</svg>

@@ -1,0 +1,310 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  scrollbar-width: none;
+  --font-orbitron: 'Orbitron', sans-serif;
+  --font-clash: 'Clash Display', sans-serif;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  
+  /* Background Texture */
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url('/images/bg-texture.png');
+  
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-blend-mode: overlay; 
+
+  color: white;
+  font-family: 'Arial', sans-serif;
+  overflow-x: hidden;
+}
+
+[data-theme="light"] body {
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)),
+    url('/images/bg-texture.png');
+  background-blend-mode: overlay;
+  color: black;
+}
+
+/* Light theme text colors */
+[data-theme="light"] .text-white {
+  color: #111111;
+}
+[data-theme="light"] .text-white\/5 {
+  color: rgba(17, 17, 17, 0.05);
+}
+[data-theme="light"] .text-white\/10 {
+  color: rgba(17, 17, 17, 0.1);
+}
+[data-theme="light"] .text-white\/20 {
+  color: rgba(17, 17, 17, 0.2);
+}
+[data-theme="light"] .text-white\/30 {
+  color: rgba(17, 17, 17, 0.3);
+}
+[data-theme="light"] .text-white\/40 {
+  color: rgba(17, 17, 17, 0.4);
+}
+[data-theme="light"] .text-white\/50 {
+  color: rgba(17, 17, 17, 0.5);
+}
+[data-theme="light"] .text-white\/60 {
+  color: rgba(17, 17, 17, 0.6);
+}
+[data-theme="light"] .text-white\/70 {
+  color: rgba(17, 17, 17, 0.7);
+}
+[data-theme="light"] .text-white\/80 {
+  color: rgba(17, 17, 17, 0.8);
+}
+[data-theme="light"] .text-white\/90 {
+  color: rgba(17, 17, 17, 0.9);
+}
+
+/* Light theme border colors */
+[data-theme="light"] .border-white {
+  border-color: #d0d0d0;
+}
+[data-theme="light"] .border-white\/10 {
+  border-color: rgba(0, 0, 0, 0.05);
+}
+[data-theme="light"] .border-white\/20 {
+  border-color: rgba(0, 0, 0, 0.1);
+}
+[data-theme="light"] .border-white\/30 {
+  border-color: rgba(0, 0, 0, 0.15);
+}
+[data-theme="light"] .border-white\/40 {
+  border-color: rgba(0, 0, 0, 0.2);
+}
+[data-theme="light"] .bg-white\/20 {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+[data-theme="light"] .bg-white\/30 {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+[data-theme="light"] .bg-white\/40 {
+  background-color: rgba(0, 0, 0, 0.15);
+}
+
+
+@keyframes speakers-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.animate-speakers-marquee {
+  width: max-content;
+  animation: speakers-marquee 55s linear infinite;
+  will-change: transform;
+}
+
+.font-orbitron {
+  font-family: var(--font-orbitron);
+}
+
+.font-clash {
+  font-family: var(--font-clash);
+}
+
+.font-tedxiceas {
+  font-family: 'Helvetica', 'Arial', sans-serif;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  width: max-content;
+  animation: marquee 55s linear infinite;
+  will-change: transform;
+}
+
+
+/* src/app/globals.css */
+
+/* ... existing code ... */
+
+/* --- JOURNEY PAGE ANIMATIONS --- */
+
+/* 1. Define the rotation Keyframes */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spin-reverse-slow {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+/* 2. Create Utility Classes */
+.animate-spin-slow {
+  /* 25 seconds for a full rotation (Outer Ring) */
+  animation: spin-slow 25s linear infinite;
+}
+
+.animate-spin-reverse-slow {
+  /* 20 seconds reverse rotation (Inner Ring) */
+  animation: spin-reverse-slow 20s linear infinite;
+}
+
+/* 3. Smooth Transitions for the Eye Movement */
+.transition-bouncy {
+  /* This makes the eye 'pop' when it moves to the top */
+  transition-timing-function: cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+/* src/app/globals.css */
+
+/* ... existing code ... */
+
+/* --- NEW JOURNEY SPIRAL ANIMATION --- */
+
+/* Base style for a single digit on a ring */
+.ring-digit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  
+  /* * Core Placement Logic:
+   * 1. Rotate to the correct angle around the circle.
+   * 2. Move outward by the radius.
+   * 3. Rotate back so the number stays upright.
+   */
+  transform: rotate(var(--angle)) translateX(var(--radius)) rotate(calc(var(--angle) * -1));
+  
+  /* Smooth transition for popping out */
+  transition: transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 1.5s ease-out, scale 1.5s ease-out;
+  
+  /* Final state defaults */
+  scale: 1;
+  opacity: 1;
+}
+
+/* The "Hidden" state (before spiraling out) */
+.digits-hidden .ring-digit {
+  scale: 0;
+  opacity: 0;
+  /* Crucial: Overwrite the radius to 0 to suck them into the center */
+  transform: rotate(var(--angle)) translateX(0px) rotate(calc(var(--angle) * -1)) !important;
+}
+
+/* Styling for the Outer Ring (Dimmer) */
+.outer-ring-digits {
+  color: rgba(255, 255, 255, 0.4); /* Dim grey/white */
+}
+
+/* Styling for the Inner Ring (Brighter) */
+.inner-ring-digits {
+  color: white;
+  font-weight: 700; /* Bold */
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.8); /* Bright glow */
+}
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-track {
+  background: #ffffff;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--tedx-red);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--tedx-red-dark);
+}
+
+/* Red glow container with rotation animation */
+.red-glow-container {
+  position: relative;
+  animation: tilt-glow 8s ease-in-out infinite;
+}
+
+@keyframes tilt-glow {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  25% {
+    transform: rotate(3deg);
+  }
+
+  50% {
+    transform: rotate(0deg);
+  }
+
+  75% {
+    transform: rotate(-3deg);
+  }
+
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+
+
+/* Grayscale filter for speaker images */
+.grayscale-img {
+  filter: grayscale(100%);
+  transition: filter 0.3s ease;
+}
+
+.grayscale-img:hover {
+  filter: grayscale(50%);
+}
+
+/* Line clamp utility */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+

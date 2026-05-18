@@ -1,0 +1,14 @@
+{
+  "redirects": [
+    {
+      "source": "/tic",
+      "destination": "/tickets",
+      "permanent": true
+    },
+    {
+      "source": "/ticket",
+      "destination": "/tickets",
+      "permanent": true
+    }
+  ]
+}
