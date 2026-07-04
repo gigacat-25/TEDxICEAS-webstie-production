@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence, useScroll, useMotionValueEvent, Variants } from "framer-motion";
 import { useTheme } from "./ThemeContext";
+import { useCoreMetrics } from "./ThemeMetrics";
 
 const navLinks = [
   { name: "MOSAIC", href: "/chat" },
@@ -63,12 +64,14 @@ const Navbar = ({ startAnimation = true }: { startAnimation?: boolean }) => {
     }
   };
 
+  const metrics = useCoreMetrics();
+
   const menuItemVariants: Variants = {
-    closed: { y: 20, opacity: 0 },
+    closed: { y: metrics.y, opacity: metrics.opacity - 1 },
     open: (i: number) => ({
       y: 0,
-      opacity: 1,
-      transition: { delay: i * 0.1, duration: 0.5, ease: "easeOut" }
+      opacity: metrics.opacity,
+      transition: { delay: i * metrics.stagger, duration: 0.5, ease: "easeOut" }
     })
   };
 

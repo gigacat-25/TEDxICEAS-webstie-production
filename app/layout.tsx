@@ -5,6 +5,7 @@ import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ThemeProvider } from "./components/ThemeContext";
+import ThemeMetricsProvider from "./components/ThemeMetrics";
 import { venue, event } from "@/lib/venue";
 import ParticleCanvas from "./components/hero/ParticleCanvas";
 import MosaicFloatingButton from "./components/chat/MosaicFloatingButton";
@@ -105,6 +106,7 @@ export default function RootLayout({
         className={`${orbitron.variable} ${clashDisplay.variable} antialiased`}
       >
         <ThemeProvider>
+          <ThemeMetricsProvider />
           <ParticleCanvas />
           {children}
           <MosaicFloatingButton />

@@ -235,31 +235,22 @@ export default function TeamPage() {
               viewport={{ once: true }}
               className="text-2xl md:text-4xl font-semibold tracking-tight font-orbitron text-white mb-12"
             >
-              Organizing <span className="text-[#EB0028]">Teams</span>
+              The <span className="text-[#EB0028]">Team</span>
             </motion.h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {teamsData.map((team, idx) => (
-                <motion.div 
-                  key={idx}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: idx * 0.1 }}
-                  className="rounded-3xl border border-white/10 bg-white/[0.02] p-8 hover:border-[#EB0028]/50 transition-colors"
-                >
-                  <h3 className="text-xl font-medium font-clash text-white mb-6 border-b border-white/10 pb-4">{team.name}</h3>
-                  <ul className="space-y-3">
-                    {team.members.map((member, mIdx) => (
-                      <li key={mIdx} className="text-white/70 text-sm flex items-center gap-3">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#EB0028]"></span>
-                        {member}
-                      </li>
-                    ))}
-                  </ul>
-                </motion.div>
-              ))}
-            </div>
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="relative w-full aspect-video rounded-3xl overflow-hidden border border-white/10"
+            >
+              <Image 
+                src="/team/TEAM.jpg" 
+                alt="The Organizing Team" 
+                fill 
+                className="object-cover" 
+              />
+            </motion.div>
           </div>
         </div>
       </section>
