@@ -128,6 +128,14 @@ const Navbar = ({ startAnimation = true }: { startAnimation?: boolean }) => {
               <Link
                 key={link.name}
                 href={link.href}
+                onClick={(e) => {
+                  if (pathname === '/' && link.href.startsWith('/#')) {
+                    e.preventDefault();
+                    const targetId = link.href.substring(2);
+                    const elem = document.getElementById(targetId);
+                    if (elem) elem.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
                 className={`font-clash font-normal text-[14px] leading-[100%] tracking-[-0.02em] hover:text-[#EB0028] transition-colors cursor-pointer py-4 ${theme === "dark" ? "text-white" : "text-black"}`}
               >
                 {link.name}
@@ -190,7 +198,15 @@ const Navbar = ({ startAnimation = true }: { startAnimation?: boolean }) => {
                   <Link
                     key={item.name}
                     href={item.href}
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={(e) => {
+                      setIsMenuOpen(false);
+                      if (pathname === '/' && item.href.startsWith('/#')) {
+                        e.preventDefault();
+                        const targetId = item.href.substring(2);
+                        const elem = document.getElementById(targetId);
+                        if (elem) elem.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    }}
                     className="flex items-center gap-6 group"
                   >
                     <motion.div
