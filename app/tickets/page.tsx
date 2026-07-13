@@ -56,7 +56,7 @@ const faqs = [
   },
   {
     question: "Who can I contact for ticket-related issues?",
-    answer: "For any ticket-related inquiries, message or call Rayif - +91 97464 02973",
+    answer: "For any ticket-related inquiries, message or call Thejaswin P - +91 98457 14699",
   },
   {
     question: "What do I need to bring to the event?",
@@ -1106,7 +1106,7 @@ export default function TicketsPage() {
                     <li><strong>Storage and Security:</strong> Your personal details are stored securely in our protected database, and your payment screenshot is kept in a secure, private storage bucket. Only authorized administrators have access to this information.</li>
                     <li><strong>Retention Period:</strong> All personal data collected will be permanently deleted from our servers within 30 days after the conclusion of the TEDxICEAS event, except where required for accounting or legal compliance.</li>
                     <li><strong>Your Rights:</strong> As a "Data Principal" under the DPDP Act, you have the right to access your data, request correction of any inaccurate details, request erasure of your data, or withdraw your consent.</li>
-                    <li><strong>Grievances and Support:</strong> If you wish to withdraw consent, erase your data, or report any grievance, you can write directly to our designated Grievance Officer, Rayif, at <a href="mailto:tedxiceas.alerts@gmail.com" className="text-[#EB0028] hover:underline font-medium">tedxiceas.alerts@gmail.com</a> or via phone at +91 97464 02973.</li>
+                    <li><strong>Grievances and Support:</strong> If you wish to withdraw consent, erase your data, or report any grievance, you can write directly to our designated Grievance Officer, Thejaswin P, at <a href="mailto:tedxiceas.alerts@gmail.com" className="text-[#EB0028] hover:underline font-medium">tedxiceas.alerts@gmail.com</a> or via phone at +91 98457 14699.</li>
                   </ul>
                 </div>
               </div>

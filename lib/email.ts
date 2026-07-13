@@ -71,7 +71,7 @@ export async function sendPendingConfirmationEmail(
       </p>
       
       <p style="font-size: 16px; line-height: 1.6; color: #555555;">
-        If you have any questions or made a mistake in your details, feel free to contact our team by replying to this email or calling Rayif at +91 97464 02973.
+        If you have any questions or made a mistake in your details, feel free to contact our team by replying to this email or calling Thejaswin P at +91 98457 14699.
       </p>
       
       <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #888888; font-size: 12px; line-height: 1.4;">
@@ -242,7 +242,7 @@ export async function sendRejectedEmail(
       </p>
       
       <p style="font-size: 16px; line-height: 1.6; color: #555555;">
-        If you believe this is an error or need assistance, please contact Rayif at +91 97464 02973 or reply to this email.
+        If you believe this is an error or need assistance, please contact Thejaswin P at +91 98457 14699 or reply to this email.
       </p>
       
       <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #888888; font-size: 12px; line-height: 1.4;">

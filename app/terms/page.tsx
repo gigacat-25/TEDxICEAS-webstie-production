@@ -112,7 +112,7 @@ export default function TermsAndPrivacyPage() {
                 </div>
                 <div className="space-y-1">
                   <span className="text-white/40 text-[10px] uppercase font-orbitron block">Designated Grievance Officer</span>
-                  <span className="text-white font-semibold">Rayif (+91 97464 02973)</span>
+                  <span className="text-white font-semibold">Thejaswin P (+91 98457 14699)</span>
                 </div>
               </div>
 

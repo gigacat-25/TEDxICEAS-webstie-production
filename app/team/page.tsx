@@ -15,7 +15,6 @@ type TeamMember = {
 
 const coreTeam: TeamMember[] = [
   { name: "Thejaswin P", role: "Lead Organizer and Licensee", image: "/team/Thejaswin P.jpg" },
-  { name: "Mohammed Raif", role: "Co Organizer", image: "/team/Raif.jpg" },
   { name: "Samuel Melvin", role: "Event Manager", image: "/team/Samuel Melvin.jpeg" },
   { name: "Joshua Nikhil", role: "Event Producer & Sponsorship Lead", image: "/team/Joshua.jpg" },
   { name: "Saraswati Nag H", role: "Event Co Producer", image: "/team/Saraswathi Nag.jpg" },

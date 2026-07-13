@@ -58,7 +58,6 @@ Co lead- yogitha
  Design lead-Mohammed arshan
 Co lead- Mohammed muddasir
  Thejaswin P- Lead Organizer and Licensee
-Mohammed Raif- Co Organizer 
 Event Manager- Samuel Melvin
 Event Producer- Joshua Nikhil
 Event Co Producer- Saraswati Nag H

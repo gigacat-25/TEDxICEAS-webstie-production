@@ -153,11 +153,20 @@ export const knowledgeBase: KnowledgeEntry[] = [
   {
     id: "team",
     category: "Team",
-    triggers: ["team", "organizer", "who runs", "who organizes", "committee"],
-    patterns: [/who (organizes|runs|is behind)/i, /organizing team/i, /core team/i, /volunteer/i],
+    triggers: ["team", "organizer", "who runs", "who organizes", "committee", "lead organizer"],
+    patterns: [/who (organizes|runs|is behind)/i, /organizing team/i, /core team/i, /volunteer/i, /lead organizer/i, /organizer name/i],
     response:
-      "TEDxICEAS is organized by a dedicated team of students and faculty from Impact College of Engineering and Applied Sciences. Visit the **Team** page to learn more about the core team, faculty advisors, and volunteers.",
+      "TEDxICEAS is organized by a dedicated team of students and faculty from Impact College of Engineering and Applied Sciences.\n\n• **Thejaswin P** is the Lead Organizer and Licensee.\n• **Samuel Melvin** is the Event Manager.\n• **Joshua Nikhil** is the Event Producer & Sponsorship Lead.\n• **Saraswati Nag H** is the Event Co-Producer.\n\nYou can visit the **Team** page to learn more about our core team, leads, faculty coordinators, and volunteers!",
     priority: 2,
+  },
+  {
+    id: "grievance-support",
+    category: "Support",
+    triggers: ["grievance", "support", "officer", "phone number", "contact number", "call", "phone", "help desk"],
+    patterns: [/grievance/i, /support/i, /officer/i, /phone/i, /call/i, /contact number/i, /number/i],
+    response:
+      "For any ticket-related inquiries, support, or grievances, you can contact our Designated Grievance Officer, **Thejaswin P**, at **+91 98457 14699** or write to us at **tedxiceas.alerts@gmail.com**.",
+    priority: 4,
   },
   {
     id: "about-college",
