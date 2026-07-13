@@ -9,6 +9,8 @@ import ThemeMetricsProvider from "./components/ThemeMetrics";
 import { venue, event } from "@/lib/venue";
 import ParticleCanvas from "./components/hero/ParticleCanvas";
 import MosaicFloatingButton from "./components/chat/MosaicFloatingButton";
+import { ClerkProvider } from "@clerk/nextjs";
+
 // Initialize Orbitron
 const orbitron = Orbitron({
   subsets: ["latin"],
@@ -92,28 +94,30 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" suppressHydrationWarning={true} className="snap-y snap-proximity">
-      <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-        />
-        <meta name="theme-color" content="#000000" />
-        <meta property="og:type" content="website" />
-        <link rel="icon" href="/favicon.ico" />
-      </head>
-      <body
-        className={`${orbitron.variable} ${clashDisplay.variable} antialiased`}
-      >
-        <ThemeProvider>
-          <ThemeMetricsProvider />
-          <ParticleCanvas />
-          {children}
-          <MosaicFloatingButton />
-        </ThemeProvider>
-        <Analytics />
-        <SpeedInsights />
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" suppressHydrationWarning={true} className="snap-y snap-proximity">
+        <head>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+          />
+          <meta name="theme-color" content="#000000" />
+          <meta property="og:type" content="website" />
+          <link rel="icon" href="/favicon.ico" />
+        </head>
+        <body
+          className={`${orbitron.variable} ${clashDisplay.variable} antialiased`}
+        >
+          <ThemeProvider>
+            <ThemeMetricsProvider />
+            <ParticleCanvas />
+            {children}
+            <MosaicFloatingButton />
+          </ThemeProvider>
+          <Analytics />
+          <SpeedInsights />
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

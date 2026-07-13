@@ -3,6 +3,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 
 const NotFoundPage = () => {
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 }); // eslint-disable-line @typescript-eslint/no-unused-vars
   const [isClicking, setIsClicking] = useState(false);
