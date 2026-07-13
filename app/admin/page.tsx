@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useUser, UserButton } from "@clerk/nextjs";
 import { 
   Check, 
@@ -68,6 +68,11 @@ export default function AdminDashboard() {
   } | null>(null);
   const [manualTicketCode, setManualTicketCode] = useState("");
   const [isScanSubmitting, setIsScanSubmitting] = useState(false);
+
+  // Scanner Lock Refs
+  const isProcessingRef = useRef(false);
+  const lastScannedCodeRef = useRef<string | null>(null);
+  const lastScanTimeRef = useRef<number>(0);
 
   // Action/Modal States
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
@@ -185,16 +190,31 @@ export default function AdminDashboard() {
 
   // Process scanned code
   const handleProcessScan = async (code: string, actionType: "check_in" | "food" | "goodie") => {
-    if (isScanSubmitting) return;
+    const cleanCode = code.trim();
+    if (!cleanCode) return;
+
+    // Cooldown check: prevent scanning the exact same code twice within 3 seconds
+    const now = Date.now();
+    if (cleanCode === lastScannedCodeRef.current && (now - lastScanTimeRef.current) < 3000) {
+      return;
+    }
+
+    if (isProcessingRef.current || isScanSubmitting) return;
+
+    isProcessingRef.current = true;
     setIsScanSubmitting(true);
     setScanResult(null);
+
+    // Update refs for last scanned code and time
+    lastScannedCodeRef.current = cleanCode;
+    lastScanTimeRef.current = now;
 
     try {
       const res = await fetch("/api/admin/tickets/scan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ticket_code: code.trim(),
+          ticket_code: cleanCode,
           action: actionType,
         }),
       });
@@ -223,6 +243,7 @@ export default function AdminDashboard() {
         message: "Network error occurred while processing scan.",
       });
     } finally {
+      isProcessingRef.current = false;
       setIsScanSubmitting(false);
       setManualTicketCode("");
     }
