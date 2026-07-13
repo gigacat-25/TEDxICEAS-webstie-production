@@ -228,32 +228,56 @@ export default function AdminDashboard() {
     }
   };
 
-  // Setup html5-qrcode scanner
+  // Setup html5-qrcode raw scanner
   useEffect(() => {
     if (viewMode !== "scanner") return;
 
     let scannerInstance: any = null;
+    let isScanning = false;
 
     import("html5-qrcode")
       .then((lib) => {
-        scannerInstance = new lib.Html5QrcodeScanner(
-          "qr-reader",
-          { 
-            fps: 10, 
-            qrbox: { width: 250, height: 250 },
-            aspectRatio: 1.0 
-          },
-          false
-        );
+        scannerInstance = new lib.Html5Qrcode("qr-reader");
 
-        scannerInstance.render(
+        scannerInstance.start(
+          { facingMode: "environment" },
+          {
+            fps: 10,
+            qrbox: { width: 250, height: 250 },
+          },
           (decodedText: string) => {
             handleProcessScan(decodedText, activeScanAction);
           },
-          (error: any) => {
-            // Quietly ignore scan mismatches
+          (errorMessage: string) => {
+            // Quietly ignore scan errors
           }
-        );
+        )
+        .then(() => {
+          isScanning = true;
+        })
+        .catch((err: any) => {
+          console.warn("Failed starting with environment facingMode, trying user facingMode:", err);
+          // Try user facingMode (e.g. front camera if environment camera is not available)
+          scannerInstance.start(
+            { facingMode: "user" },
+            {
+              fps: 10,
+              qrbox: { width: 250, height: 250 },
+            },
+            (decodedText: string) => {
+              handleProcessScan(decodedText, activeScanAction);
+            },
+            (errorMessage: string) => {
+              // Quietly ignore
+            }
+          )
+          .then(() => {
+            isScanning = true;
+          })
+          .catch((fallbackErr: any) => {
+            console.error("Failed fallback camera start:", fallbackErr);
+          });
+        });
       })
       .catch((err) => {
         console.error("Error loading html5-qrcode library:", err);
@@ -261,9 +285,11 @@ export default function AdminDashboard() {
 
     return () => {
       if (scannerInstance) {
-        scannerInstance.clear().catch((err: any) => {
-          console.error("Failed to clear scanner:", err);
-        });
+        if (isScanning) {
+          scannerInstance.stop().catch((err: any) => {
+            console.error("Failed to stop scanner:", err);
+          });
+        }
       }
     };
   }, [viewMode, activeScanAction]);
@@ -499,9 +525,9 @@ export default function AdminDashboard() {
               </div>
 
               {/* Camera Scanner Box */}
-              <div className="relative border border-white/10 rounded-xl overflow-hidden bg-black aspect-video flex flex-col items-center justify-center p-4">
-                <div id="qr-reader" className="w-full max-w-[400px]"></div>
-                <div className="absolute top-4 right-4 flex items-center gap-2 bg-black/60 backdrop-blur-sm border border-white/10 py-1.5 px-3 rounded-full text-[10px] tracking-wide text-white/70 uppercase">
+              <div className="relative border border-white/10 rounded-xl overflow-hidden bg-black flex flex-col items-center justify-center p-4 min-h-[300px]">
+                <div id="qr-reader" className="w-full max-w-[400px] overflow-hidden rounded-lg"></div>
+                <div className="absolute top-4 right-4 z-10 flex items-center gap-2 bg-black/60 backdrop-blur-sm border border-white/10 py-1.5 px-3 rounded-full text-[10px] tracking-wide text-white/70 uppercase">
                   <span className="w-2 h-2 rounded-full bg-[#EB0028] animate-ping"></span>
                   Scanner Live
                 </div>
