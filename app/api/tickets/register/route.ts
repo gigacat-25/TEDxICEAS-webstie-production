@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
     const ticketCountStr = formData.get("ticketCount") as string;
     const pricePaidStr = formData.get("pricePaid") as string;
     const screenshot = formData.get("screenshot") as File | null;
+    const additionalAttendeesStr = formData.get("additionalAttendees") as string | null;
 
     if (!name || !email || !phone || !category || !ticketCountStr || !pricePaidStr || !screenshot) {
       return NextResponse.json(
@@ -41,6 +42,39 @@ export async function POST(req: NextRequest) {
         { success: false, error: "Invalid email format." },
         { status: 400 }
       );
+    }
+
+    // Parse and validate additional attendees
+    let additionalAttendees: { name: string; email: string }[] = [];
+    if (additionalAttendeesStr) {
+      try {
+        additionalAttendees = JSON.parse(additionalAttendeesStr);
+      } catch (err) {
+        console.error("Failed to parse additionalAttendees JSON:", err);
+      }
+    }
+
+    if (ticketCount > 1) {
+      if (additionalAttendees.length !== ticketCount - 1) {
+        return NextResponse.json(
+          { success: false, error: "Mismatch between ticketCount and additional attendees provided." },
+          { status: 400 }
+        );
+      }
+      for (const att of additionalAttendees) {
+        if (!att.name || !att.name.trim()) {
+          return NextResponse.json(
+            { success: false, error: "All additional attendees must have a valid name." },
+            { status: 400 }
+          );
+        }
+        if (!att.email || !emailRegex.test(att.email)) {
+          return NextResponse.json(
+            { success: false, error: `Invalid email format for attendee ${att.name}.` },
+            { status: 400 }
+          );
+        }
+      }
     }
 
     // 1. Upload screenshot to Supabase Storage
@@ -85,25 +119,51 @@ export async function POST(req: NextRequest) {
 
     const screenshotPath = uploadData.path;
 
-    // 2. Insert ticket registration into Supabase database (with clerk_user_id)
-    const { data: ticketData, error: dbError } = await supabaseAdmin
-      .from("tickets")
-      .insert({
-        name,
-        email,
-        phone,
+    // Generate a unique group_id for this multi-ticket transaction
+    const groupId = `group_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    const individualPrice = pricePaid / ticketCount;
+
+    // Prepare rows for bulk insertion
+    const rowsToInsert = [];
+
+    // Add Booker (Attendee 1)
+    rowsToInsert.push({
+      name,
+      email,
+      phone,
+      category,
+      ticket_count: 1, // Split into single ticket rows for distinct check-in/passes
+      price_paid: individualPrice,
+      screenshot_path: screenshotPath,
+      status: "pending",
+      clerk_user_id: userId,
+      group_id: groupId,
+    });
+
+    // Add Additional Attendees
+    for (const att of additionalAttendees) {
+      rowsToInsert.push({
+        name: att.name,
+        email: att.email,
+        phone, // Use booker's phone as transaction contact reference
         category,
-        ticket_count: ticketCount,
-        price_paid: pricePaid,
+        ticket_count: 1,
+        price_paid: individualPrice,
         screenshot_path: screenshotPath,
         status: "pending",
         clerk_user_id: userId,
-      })
-      .select()
-      .single();
+        group_id: groupId,
+      });
+    }
 
-    if (dbError) {
-      console.error("Database insert error:", dbError);
+    // 2. Bulk insert tickets
+    const { data: insertedTickets, error: dbError } = await supabaseAdmin
+      .from("tickets")
+      .insert(rowsToInsert)
+      .select();
+
+    if (dbError || !insertedTickets || insertedTickets.length === 0) {
+      console.error("Database bulk insert error:", dbError);
       // Clean up uploaded file if DB insert fails
       await supabaseAdmin.storage.from("payment-screenshots").remove([screenshotPath]);
       return NextResponse.json(
@@ -112,25 +172,28 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 3. Send "Pending" confirmation email asynchronously
-    try {
-      await sendPendingConfirmationEmail(email, name, {
-        category,
-        ticketCount,
-        pricePaid,
-      });
-    } catch (emailErr) {
-      // Don't fail the request if only the email fails, but log it
-      console.error("Nodemailer pending email error:", emailErr);
+    // 3. Send "Pending" confirmation email asynchronously to all attendees
+    for (const row of rowsToInsert) {
+      try {
+        await sendPendingConfirmationEmail(row.email, row.name, {
+          category,
+          ticketCount: 1,
+          pricePaid: row.price_paid,
+        });
+      } catch (emailErr) {
+        console.error(`Nodemailer pending email error for ${row.email}:`, emailErr);
+      }
     }
 
+    // Return the main ticket's details for success feedback
+    const mainTicket = insertedTickets[0];
     return NextResponse.json({
       success: true,
       ticket: {
-        id: ticketData.id,
-        name: ticketData.name,
-        email: ticketData.email,
-        status: ticketData.status,
+        id: mainTicket.id,
+        name: mainTicket.name,
+        email: mainTicket.email,
+        status: mainTicket.status,
       },
     });
 

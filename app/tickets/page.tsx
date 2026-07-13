@@ -88,6 +88,25 @@ export default function TicketsPage() {
   const [ticketCount, setTicketCount] = useState(1);
   const [screenshot, setScreenshot] = useState<File | null>(null);
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
+  const [additionalAttendees, setAdditionalAttendees] = useState<{ name: string; email: string }[]>([]);
+
+  // Sync additional attendees array size to ticketCount - 1
+  useEffect(() => {
+    setAdditionalAttendees((prev) => {
+      const targetLength = ticketCount - 1;
+      if (targetLength <= 0) return [];
+      
+      const newAttendees = [...prev];
+      if (newAttendees.length < targetLength) {
+        while (newAttendees.length < targetLength) {
+          newAttendees.push({ name: "", email: "" });
+        }
+      } else if (newAttendees.length > targetLength) {
+        newAttendees.length = targetLength;
+      }
+      return newAttendees;
+    });
+  }, [ticketCount]);
 
   // API Submission States
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -211,6 +230,22 @@ export default function TicketsPage() {
       setErrorMessage("Please enter a valid phone number (at least 10 digits).");
       return;
     }
+
+    // Validate additional attendees
+    if (ticketCount > 1) {
+      for (let i = 0; i < additionalAttendees.length; i++) {
+        const att = additionalAttendees[i];
+        if (!att.name.trim()) {
+          setErrorMessage(`Please enter the full name for Attendee #${i + 2}.`);
+          return;
+        }
+        if (!att.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(att.email)) {
+          setErrorMessage(`Please enter a valid email address for Attendee #${i + 2}.`);
+          return;
+        }
+      }
+    }
+
     if (!agreedToTerms) {
       setErrorMessage("You must agree to the Terms & Conditions and DPDP Privacy Policy to proceed.");
       return;
@@ -239,6 +274,10 @@ export default function TicketsPage() {
       formData.append("ticketCount", ticketCount.toString());
       formData.append("pricePaid", totalAmount.toString());
       formData.append("screenshot", screenshot);
+
+      if (ticketCount > 1) {
+        formData.append("additionalAttendees", JSON.stringify(additionalAttendees));
+      }
 
       const response = await fetch("/api/tickets/register", {
         method: "POST",
@@ -598,6 +637,60 @@ export default function TicketsPage() {
                       </button>
                     </div>
                   </div>
+
+                  {/* Additional Attendees Fields */}
+                  {ticketCount > 1 && (
+                    <div className="space-y-4 pt-4 border-t border-white/10">
+                      <h4 className="font-orbitron font-bold text-xs uppercase tracking-wider text-white/50">
+                        Additional Attendee Details
+                      </h4>
+                      <div className="space-y-3 max-h-[220px] overflow-y-auto pr-2 custom-scrollbar">
+                        {additionalAttendees.map((att, idx) => (
+                          <div key={idx} className="p-4 bg-zinc-900/60 border border-white/5 rounded-xl space-y-3">
+                            <p className="font-clash text-xs font-semibold text-[#EB0028] uppercase tracking-wider">
+                              Attendee #{idx + 2}
+                            </p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              <div className="space-y-1">
+                                <label className="block text-[11px] font-clash text-white/60">
+                                  Full Name
+                                </label>
+                                <input
+                                  type="text"
+                                  required
+                                  value={att.name}
+                                  onChange={(e) => {
+                                    const updated = [...additionalAttendees];
+                                    updated[idx].name = e.target.value;
+                                    setAdditionalAttendees(updated);
+                                  }}
+                                  placeholder="Attendee Name"
+                                  className="w-full bg-zinc-950 border border-white/5 rounded-lg py-2 px-3 text-xs text-white font-clash placeholder-white/20 focus:outline-none focus:border-[#EB0028] transition-colors"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <label className="block text-[11px] font-clash text-white/60">
+                                  Email Address
+                                </label>
+                                <input
+                                  type="email"
+                                  required
+                                  value={att.email}
+                                  onChange={(e) => {
+                                    const updated = [...additionalAttendees];
+                                    updated[idx].email = e.target.value;
+                                    setAdditionalAttendees(updated);
+                                  }}
+                                  placeholder="attendee@example.com"
+                                  className="w-full bg-zinc-950 border border-white/5 rounded-lg py-2 px-3 text-xs text-white font-clash placeholder-white/20 focus:outline-none focus:border-[#EB0028] transition-colors"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Price Calculation Summary */}
                   <div className="border-t border-white/10 pt-4 flex justify-between items-center text-lg mt-6">

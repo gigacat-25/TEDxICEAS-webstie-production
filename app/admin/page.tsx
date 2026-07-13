@@ -777,6 +777,7 @@ export default function AdminDashboard() {
                       <th className="py-4 px-6">Price</th>
                       <th className="py-4 px-6">Status</th>
                       <th className="py-4 px-6">Ticket Code</th>
+                      <th className="py-4 px-6">Claimed</th>
                       <th className="py-4 px-6 text-right">Actions</th>
                     </tr>
                   </thead>
@@ -823,6 +824,47 @@ export default function AdminDashboard() {
                         <td className="py-4 px-6 font-mono text-xs text-emerald-400 font-bold">
                           {ticket.ticket_code || (
                             <span className="text-xs text-white/30 italic">Pending check</span>
+                          )}
+                        </td>
+                        <td className="py-4 px-6">
+                          {ticket.status === "approved" ? (
+                            <div className="flex gap-2">
+                              {/* Checked In */}
+                              <span
+                                title={ticket.checked_in && ticket.checked_in_at ? `Checked In: ${new Date(ticket.checked_in_at).toLocaleTimeString()}` : "Not Checked In"}
+                                className={`p-1.5 rounded border transition-colors inline-block ${
+                                  ticket.checked_in
+                                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                                    : "bg-zinc-900 border-white/5 text-white/20"
+                                }`}
+                              >
+                                <Users size={12} />
+                              </span>
+                              {/* Food Claimed */}
+                              <span
+                                title={ticket.food_claimed && ticket.food_claimed_at ? `Food claimed: ${new Date(ticket.food_claimed_at).toLocaleTimeString()}` : "Food not claimed"}
+                                className={`p-1.5 rounded border transition-colors inline-block ${
+                                  ticket.food_claimed
+                                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                                    : "bg-zinc-900 border-white/5 text-white/20"
+                                }`}
+                              >
+                                <Utensils size={12} />
+                              </span>
+                              {/* Goodies Claimed */}
+                              <span
+                                title={ticket.goodie_claimed && ticket.goodie_claimed_at ? `Goodie claimed: ${new Date(ticket.goodie_claimed_at).toLocaleTimeString()}` : "Goodies not claimed"}
+                                className={`p-1.5 rounded border transition-colors inline-block ${
+                                  ticket.goodie_claimed
+                                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                                    : "bg-zinc-900 border-white/5 text-white/20"
+                                }`}
+                              >
+                                <Gift size={12} />
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-xs text-white/20">—</span>
                           )}
                         </td>
                         <td className="py-4 px-6 text-right">
