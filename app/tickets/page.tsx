@@ -90,6 +90,7 @@ export default function TicketsPage() {
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
   const [usn, setUsn] = useState("");
   const [additionalAttendees, setAdditionalAttendees] = useState<{ name: string; email: string; usn: string }[]>([]);
+  const [isValidatingUsn, setIsValidatingUsn] = useState(false);
 
   // Sync additional attendees array size to ticketCount - 1
   useEffect(() => {
@@ -220,7 +221,8 @@ export default function TicketsPage() {
   };
 
   // Validate Step 1
-  const handleNextStep = () => {
+  const handleNextStep = async () => {
+    if (isValidatingUsn) return;
     if (!name.trim()) {
       setErrorMessage("Please enter your full name.");
       return;
@@ -240,6 +242,37 @@ export default function TicketsPage() {
         setErrorMessage("Please enter your University Seat Number (USN).");
         return;
       }
+
+      setIsValidatingUsn(true);
+      setErrorMessage("");
+      try {
+        const res = await fetch(`/api/tickets/verify-usn?usn=${encodeURIComponent(usn.trim())}`);
+        const data = await res.json();
+        
+        if (!res.ok || !data.success) {
+          setErrorMessage(data.error || "Failed to verify USN. Please check your connection.");
+          setIsValidatingUsn(false);
+          return;
+        }
+
+        if (!data.valid) {
+          setErrorMessage(data.message || `The USN '${usn.toUpperCase()}' is not pre-authorized for student tickets. Please contact the administrator.`);
+          setIsValidatingUsn(false);
+          return;
+        }
+
+        if (data.alreadyRegistered) {
+          setErrorMessage(`The USN '${usn.toUpperCase()}' has already booked a ticket. Each student is allowed only one pass.`);
+          setIsValidatingUsn(false);
+          return;
+        }
+      } catch (err) {
+        console.error(err);
+        setErrorMessage("A network error occurred while verifying the USN.");
+        setIsValidatingUsn(false);
+        return;
+      }
+      setIsValidatingUsn(false);
     }
 
     // Validate additional attendees
@@ -784,9 +817,17 @@ export default function TicketsPage() {
                   <div className="pt-6">
                     <button
                       onClick={handleNextStep}
-                      className="w-full bg-[#EB0028] hover:bg-[#c30020] text-white font-clash py-4 rounded-lg font-medium tracking-wide uppercase transition-colors duration-300 flex items-center justify-center gap-2 cursor-pointer"
+                      disabled={isValidatingUsn}
+                      className="w-full bg-[#EB0028] hover:bg-[#c30020] disabled:bg-zinc-800 disabled:text-white/45 disabled:cursor-not-allowed text-white font-clash py-4 rounded-lg font-medium tracking-wide uppercase transition-colors duration-300 flex items-center justify-center gap-2 cursor-pointer"
                     >
-                      <span>Proceed to Payment</span>
+                      {isValidatingUsn ? (
+                        <>
+                          <Loader2 size={16} className="animate-spin" />
+                          <span>Verifying Student USN...</span>
+                        </>
+                      ) : (
+                        <span>Proceed to Payment</span>
+                      )}
                     </button>
                   </div>
                 </div>
