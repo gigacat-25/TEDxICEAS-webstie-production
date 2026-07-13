@@ -656,22 +656,26 @@ export default function TicketsPage() {
                   <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-4 flex items-center justify-between mt-6">
                     <div>
                       <h4 className="font-clash font-semibold text-white">Quantity</h4>
-                      <p className="text-xs text-white/50 font-clash mt-0.5">Maximum 5 tickets per booking</p>
+                      <p className="text-xs text-white/50 font-clash mt-0.5">
+                        {selectedTicket.type === "Student"
+                          ? "Student tickets are limited to 1 per booking"
+                          : "Maximum 5 tickets per booking"}
+                      </p>
                     </div>
                     <div className="flex items-center gap-4">
                       <button
                         onClick={() => setTicketCount(Math.max(1, ticketCount - 1))}
-                        disabled={ticketCount <= 1}
+                        disabled={ticketCount <= 1 || selectedTicket.type === "Student"}
                         className="w-10 h-10 rounded-lg border border-white/10 flex items-center justify-center text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer"
                       >
                         <Minus size={16} />
                       </button>
                       <span className="font-orbitron font-bold text-lg text-white w-6 text-center">
-                        {ticketCount}
+                        {selectedTicket.type === "Student" ? 1 : ticketCount}
                       </span>
                       <button
                         onClick={() => setTicketCount(Math.min(5, ticketCount + 1))}
-                        disabled={ticketCount >= 5}
+                        disabled={ticketCount >= 5 || selectedTicket.type === "Student"}
                         className="w-10 h-10 rounded-lg border border-white/10 flex items-center justify-center text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer"
                       >
                         <Plus size={16} />

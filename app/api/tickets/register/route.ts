@@ -80,6 +80,12 @@ export async function POST(req: NextRequest) {
 
     // Student USN Validation
     if (category === "Student") {
+      if (ticketCount !== 1) {
+        return NextResponse.json(
+          { success: false, error: "Student registrations are limited to exactly 1 ticket per booking." },
+          { status: 400 }
+        );
+      }
       const usnsToVerify = [usn, ...additionalAttendees.map(a => a.usn)]
         .map(u => (u || "").trim().toUpperCase())
         .filter(Boolean);
