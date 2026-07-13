@@ -68,6 +68,8 @@ export default function AdminDashboard() {
   } | null>(null);
   const [manualTicketCode, setManualTicketCode] = useState("");
   const [isScanSubmitting, setIsScanSubmitting] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const isPausedRef = useRef(false);
 
   // Scanner Lock Refs
   const isProcessingRef = useRef(false);
@@ -243,10 +245,21 @@ export default function AdminDashboard() {
         message: "Network error occurred while processing scan.",
       });
     } finally {
-      isProcessingRef.current = false;
       setIsScanSubmitting(false);
       setManualTicketCode("");
+      setIsPaused(true);
+      isPausedRef.current = true;
     }
+  };
+
+  const handleScanNext = () => {
+    setScanResult(null);
+    setManualTicketCode("");
+    setIsPaused(false);
+    isPausedRef.current = false;
+    isProcessingRef.current = false;
+    lastScannedCodeRef.current = null;
+    lastScanTimeRef.current = 0;
   };
 
   // Setup html5-qrcode raw scanner
@@ -267,6 +280,7 @@ export default function AdminDashboard() {
             qrbox: { width: 250, height: 250 },
           },
           (decodedText: string) => {
+            if (isPausedRef.current) return;
             handleProcessScan(decodedText, activeScanAction);
           },
           (errorMessage: string) => {
@@ -286,6 +300,7 @@ export default function AdminDashboard() {
               qrbox: { width: 250, height: 250 },
             },
             (decodedText: string) => {
+              if (isPausedRef.current) return;
               handleProcessScan(decodedText, activeScanAction);
             },
             (errorMessage: string) => {
@@ -547,11 +562,31 @@ export default function AdminDashboard() {
 
               {/* Camera Scanner Box */}
               <div className="relative border border-white/10 rounded-xl overflow-hidden bg-black flex flex-col items-center justify-center p-4 min-h-[300px]">
-                <div id="qr-reader" className="w-full max-w-[400px] overflow-hidden rounded-lg"></div>
-                <div className="absolute top-4 right-4 z-10 flex items-center gap-2 bg-black/60 backdrop-blur-sm border border-white/10 py-1.5 px-3 rounded-full text-[10px] tracking-wide text-white/70 uppercase">
-                  <span className="w-2 h-2 rounded-full bg-[#EB0028] animate-ping"></span>
-                  Scanner Live
-                </div>
+                <div id="qr-reader" className={`w-full max-w-[400px] overflow-hidden rounded-lg transition-all duration-300 ${isPaused ? "blur-md opacity-40 scale-95 pointer-events-none" : ""}`}></div>
+                
+                {isPaused ? (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/75 z-20 p-6 text-center space-y-4 animate-fadeIn">
+                    <div className="p-3 bg-zinc-900 border border-white/10 rounded-full text-white/50">
+                      <ScanLine size={32} />
+                    </div>
+                    <div>
+                      <h4 className="font-orbitron font-bold text-white uppercase tracking-wider text-sm">Scanner Paused</h4>
+                      <p className="text-white/40 text-xs mt-1">Review the scan details and click the button to continue scanning</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleScanNext}
+                      className="px-6 py-2.5 bg-[#EB0028] hover:bg-[#c30020] text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-all cursor-pointer shadow-lg hover:shadow-[#EB0028]/20"
+                    >
+                      Scan Next Ticket
+                    </button>
+                  </div>
+                ) : (
+                  <div className="absolute top-4 right-4 z-10 flex items-center gap-2 bg-black/60 backdrop-blur-sm border border-white/10 py-1.5 px-3 rounded-full text-[10px] tracking-wide text-white/70 uppercase">
+                    <span className="w-2 h-2 rounded-full bg-[#EB0028] animate-ping"></span>
+                    Scanner Live
+                  </div>
+                )}
               </div>
 
               {/* Manual input fallback */}
@@ -675,6 +710,16 @@ export default function AdminDashboard() {
                         </div>
                       </div>
                     )}
+
+                    {/* Scan Next Button in details view */}
+                    <button
+                      type="button"
+                      onClick={handleScanNext}
+                      className="w-full py-3 bg-[#EB0028] hover:bg-[#c30020] text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-md hover:shadow-[#EB0028]/10"
+                    >
+                      <ScanLine size={14} />
+                      <span>Scan Next Ticket</span>
+                    </button>
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center text-center py-20 space-y-3 text-white/30">
