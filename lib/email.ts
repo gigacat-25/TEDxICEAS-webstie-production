@@ -94,6 +94,20 @@ export async function sendPendingConfirmationEmail(
   });
 }
 
+// Fetch QR code image from API as a buffer to send as inline email attachment (bypasses mobile Gmail client image blocking)
+async function fetchQRCodeBuffer(ticketCode: string): Promise<Buffer | null> {
+  const url = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(ticketCode)}`;
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+    if (!res.ok) return null;
+    const arrayBuffer = await res.arrayBuffer();
+    return Buffer.from(arrayBuffer);
+  } catch (err) {
+    console.error("Failed to fetch QR code buffer for inline email:", err);
+    return null;
+  }
+}
+
 export async function sendApprovedTicketEmail(
   toEmail: string,
   name: string,
@@ -103,6 +117,9 @@ export async function sendApprovedTicketEmail(
   const transporter = getTransporter();
   const subject = "Your TEDxICEAS Official Entry Ticket Confirmed! 🎟️";
   
+  const qrBuffer = await fetchQRCodeBuffer(ticketCode);
+  const qrSrc = qrBuffer ? "cid:qrcode_image" : `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${ticketCode}`;
+
   const htmlContent = `
     <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #ffffff; color: #333333;">
       <div style="text-align: center; border-bottom: 2px solid #EB0028; padding-bottom: 20px; margin-bottom: 20px;">
@@ -113,7 +130,7 @@ export async function sendApprovedTicketEmail(
       <div style="text-align: center; margin-bottom: 25px;">
         <div style="display: inline-block; background-color: #fff0f1; border: 2px dashed #EB0028; padding: 20px 30px; border-radius: 8px; margin: 10px 0;">
           <p style="font-size: 13px; text-transform: uppercase; color: #666666; margin: 0 0 10px 0; letter-spacing: 1px; font-weight: bold;">Your Ticket Entry QR Code</p>
-          <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${ticketCode}" alt="Ticket Entry QR Code" style="display: block; margin: 10px auto; width: 160px; height: 160px; border: 4px solid #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" />
+          <img src="${qrSrc}" alt="Ticket Entry QR Code" style="display: block; margin: 10px auto; width: 160px; height: 160px; border: 4px solid #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" />
           <p style="font-size: 11px; text-transform: uppercase; color: #888888; margin: 12px 0 2px 0; letter-spacing: 1px;">Ticket Code String</p>
           <h2 style="font-size: 26px; color: #EB0028; margin: 0; font-family: monospace; letter-spacing: 2px; font-weight: bold;">${ticketCode}</h2>
         </div>
@@ -170,12 +187,24 @@ export async function sendApprovedTicketEmail(
     return;
   }
 
-  await transporter.sendMail({
+  const mailOptions: any = {
     from: smtpFromEmail,
     to: toEmail,
     subject,
     html: htmlContent,
-  });
+  };
+
+  if (qrBuffer) {
+    mailOptions.attachments = [
+      {
+        filename: "qrcode.png",
+        content: qrBuffer,
+        cid: "qrcode_image",
+      },
+    ];
+  }
+
+  await transporter.sendMail(mailOptions);
 }
 
 export async function sendRejectedEmail(
