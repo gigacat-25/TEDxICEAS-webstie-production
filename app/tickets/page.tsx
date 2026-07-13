@@ -88,7 +88,8 @@ export default function TicketsPage() {
   const [ticketCount, setTicketCount] = useState(1);
   const [screenshot, setScreenshot] = useState<File | null>(null);
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
-  const [additionalAttendees, setAdditionalAttendees] = useState<{ name: string; email: string }[]>([]);
+  const [usn, setUsn] = useState("");
+  const [additionalAttendees, setAdditionalAttendees] = useState<{ name: string; email: string; usn: string }[]>([]);
 
   // Sync additional attendees array size to ticketCount - 1
   useEffect(() => {
@@ -99,7 +100,7 @@ export default function TicketsPage() {
       const newAttendees = [...prev];
       if (newAttendees.length < targetLength) {
         while (newAttendees.length < targetLength) {
-          newAttendees.push({ name: "", email: "" });
+          newAttendees.push({ name: "", email: "", usn: "" });
         }
       } else if (newAttendees.length > targetLength) {
         newAttendees.length = targetLength;
@@ -184,6 +185,8 @@ export default function TicketsPage() {
     setEmail("");
     setPhone("");
     setTicketCount(1);
+    setUsn("");
+    setAdditionalAttendees([]);
     setScreenshot(null);
     setScreenshotPreview(null);
     setErrorMessage("");
@@ -231,6 +234,14 @@ export default function TicketsPage() {
       return;
     }
 
+    // Validate USN if Category is Student
+    if (selectedTicket?.type === "Student") {
+      if (!usn.trim()) {
+        setErrorMessage("Please enter your University Seat Number (USN).");
+        return;
+      }
+    }
+
     // Validate additional attendees
     if (ticketCount > 1) {
       for (let i = 0; i < additionalAttendees.length; i++) {
@@ -242,6 +253,12 @@ export default function TicketsPage() {
         if (!att.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(att.email)) {
           setErrorMessage(`Please enter a valid email address for Attendee #${i + 2}.`);
           return;
+        }
+        if (selectedTicket?.type === "Student") {
+          if (!att.usn || !att.usn.trim()) {
+            setErrorMessage(`Please enter the University Seat Number (USN) for Attendee #${i + 2}.`);
+            return;
+          }
         }
       }
     }
@@ -274,6 +291,10 @@ export default function TicketsPage() {
       formData.append("ticketCount", ticketCount.toString());
       formData.append("pricePaid", totalAmount.toString());
       formData.append("screenshot", screenshot);
+
+      if (selectedTicket.type === "Student") {
+        formData.append("usn", usn.trim().toUpperCase());
+      }
 
       if (ticketCount > 1) {
         formData.append("additionalAttendees", JSON.stringify(additionalAttendees));
@@ -611,6 +632,26 @@ export default function TicketsPage() {
                     </div>
                   </div>
 
+                  {/* Student USN field */}
+                  {selectedTicket.type === "Student" && (
+                    <div className="space-y-2 mt-4">
+                      <label className="block text-sm font-clash font-medium text-white/75">
+                        University Seat Number (USN)
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={usn}
+                        onChange={(e) => setUsn(e.target.value)}
+                        placeholder="e.g. 1MS21CS001"
+                        className="w-full bg-zinc-900 border border-white/10 rounded-lg py-3 px-4 text-white font-clash placeholder-white/30 uppercase tracking-wider focus:outline-none focus:border-[#EB0028] transition-colors"
+                      />
+                      <p className="text-[10px] text-white/40 font-clash">
+                        Only pre-authorized student USNs are permitted to purchase Student passes.
+                      </p>
+                    </div>
+                  )}
+
                   {/* Quantity Selector */}
                   <div className="bg-zinc-900/50 border border-white/5 rounded-xl p-4 flex items-center justify-between mt-6">
                     <div>
@@ -650,7 +691,7 @@ export default function TicketsPage() {
                             <p className="font-clash text-xs font-semibold text-[#EB0028] uppercase tracking-wider">
                               Attendee #{idx + 2}
                             </p>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div className={`grid grid-cols-1 ${selectedTicket.type === "Student" ? "md:grid-cols-3" : "md:grid-cols-2"} gap-3`}>
                               <div className="space-y-1">
                                 <label className="block text-[11px] font-clash text-white/60">
                                   Full Name
@@ -685,6 +726,25 @@ export default function TicketsPage() {
                                   className="w-full bg-zinc-950 border border-white/5 rounded-lg py-2 px-3 text-xs text-white font-clash placeholder-white/20 focus:outline-none focus:border-[#EB0028] transition-colors"
                                 />
                               </div>
+                              {selectedTicket.type === "Student" && (
+                                <div className="space-y-1">
+                                  <label className="block text-[11px] font-clash text-white/60">
+                                    USN
+                                  </label>
+                                  <input
+                                    type="text"
+                                    required
+                                    value={att.usn}
+                                    onChange={(e) => {
+                                      const updated = [...additionalAttendees];
+                                      updated[idx].usn = e.target.value;
+                                      setAdditionalAttendees(updated);
+                                    }}
+                                    placeholder="Attendee USN"
+                                    className="w-full bg-zinc-950 border border-white/5 rounded-lg py-2 px-3 text-xs text-white font-clash placeholder-white/20 uppercase tracking-wider focus:outline-none focus:border-[#EB0028] transition-colors"
+                                  />
+                                </div>
+                              )}
                             </div>
                           </div>
                         ))}

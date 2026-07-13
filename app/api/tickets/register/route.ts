@@ -24,6 +24,7 @@ export async function POST(req: NextRequest) {
     const pricePaidStr = formData.get("pricePaid") as string;
     const screenshot = formData.get("screenshot") as File | null;
     const additionalAttendeesStr = formData.get("additionalAttendees") as string | null;
+    const usn = formData.get("usn") as string | null;
 
     if (!name || !email || !phone || !category || !ticketCountStr || !pricePaidStr || !screenshot) {
       return NextResponse.json(
@@ -45,7 +46,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Parse and validate additional attendees
-    let additionalAttendees: { name: string; email: string }[] = [];
+    let additionalAttendees: { name: string; email: string; usn: string }[] = [];
     if (additionalAttendeesStr) {
       try {
         additionalAttendees = JSON.parse(additionalAttendeesStr);
@@ -74,6 +75,67 @@ export async function POST(req: NextRequest) {
             { status: 400 }
           );
         }
+      }
+    }
+
+    // Student USN Validation
+    if (category === "Student") {
+      const usnsToVerify = [usn, ...additionalAttendees.map(a => a.usn)]
+        .map(u => (u || "").trim().toUpperCase())
+        .filter(Boolean);
+
+      if (usnsToVerify.length !== ticketCount) {
+        return NextResponse.json(
+          { success: false, error: "All student registrations require a valid USN." },
+          { status: 400 }
+        );
+      }
+
+      // Check for duplicate registrations in approved/pending tickets
+      const { data: existingTickets, error: dupCheckError } = await supabaseAdmin
+        .from("tickets")
+        .select("usn")
+        .in("usn", usnsToVerify)
+        .in("status", ["pending", "approved"]);
+
+      if (dupCheckError) {
+        console.error("Duplicate USN check error:", dupCheckError);
+        return NextResponse.json(
+          { success: false, error: "Failed to verify database for duplicate USNs." },
+          { status: 500 }
+        );
+      }
+
+      if (existingTickets && existingTickets.length > 0) {
+        const duplicateUsns = existingTickets.map(t => t.usn).join(", ");
+        return NextResponse.json(
+          { success: false, error: `The following USN(s) are already registered: ${duplicateUsns}. Duplicate student bookings are not allowed.` },
+          { status: 400 }
+        );
+      }
+
+      // Verify authorization from authorized_usns table
+      const { data: authorizedRows, error: authError } = await supabaseAdmin
+        .from("authorized_usns")
+        .select("usn")
+        .in("usn", usnsToVerify);
+
+      if (authError) {
+        console.error("USN authorization check error:", authError);
+        return NextResponse.json(
+          { success: false, error: "Failed to check USN list for authorization." },
+          { status: 500 }
+        );
+      }
+
+      const authorizedUsnsSet = new Set(authorizedRows?.map(r => r.usn.toUpperCase()) || []);
+      const unauthorizedUsns = usnsToVerify.filter(u => !authorizedUsnsSet.has(u));
+
+      if (unauthorizedUsns.length > 0) {
+        return NextResponse.json(
+          { success: false, error: `The following USN(s) are not pre-authorized for student pricing: ${unauthorizedUsns.join(", ")}. Please review your input or contact support.` },
+          { status: 400 }
+        );
       }
     }
 
@@ -138,6 +200,7 @@ export async function POST(req: NextRequest) {
       status: "pending",
       clerk_user_id: userId,
       group_id: groupId,
+      usn: category === "Student" && usn ? usn.trim().toUpperCase() : null,
     });
 
     // Add Additional Attendees
@@ -153,6 +216,7 @@ export async function POST(req: NextRequest) {
         status: "pending",
         clerk_user_id: userId,
         group_id: groupId,
+        usn: category === "Student" && att.usn ? att.usn.trim().toUpperCase() : null,
       });
     }
 

@@ -18,7 +18,8 @@ import {
   QrCode,
   Utensils,
   Gift,
-  ScanLine
+  ScanLine,
+  Fingerprint
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -42,6 +43,7 @@ interface Ticket {
   goodie_claimed?: boolean;
   goodie_claimed_at?: string | null;
   created_at: string;
+  usn?: string | null;
 }
 
 export default function AdminDashboard() {
@@ -56,7 +58,7 @@ export default function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
 
   // View Mode State
-  const [viewMode, setViewMode] = useState<"registrations" | "scanner">("registrations");
+  const [viewMode, setViewMode] = useState<"registrations" | "scanner" | "usns">("registrations");
 
   // Scanner States
   const [activeScanAction, setActiveScanAction] = useState<"check_in" | "food" | "goodie">("check_in");
@@ -81,6 +83,88 @@ export default function AdminDashboard() {
   const [isActionLoading, setIsActionLoading] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
   const [showRejectForm, setShowRejectForm] = useState(false);
+
+  // USN Management States
+  const [usnList, setUsnList] = useState<{ usn: string; created_at: string }[]>([]);
+  const [isUsnLoading, setIsUsnLoading] = useState(false);
+  const [bulkUsnInput, setBulkUsnInput] = useState("");
+  const [usnSearchQuery, setUsnSearchQuery] = useState("");
+  const [isUploadingUsn, setIsUploadingUsn] = useState(false);
+
+  useEffect(() => {
+    if (isLoaded && user && viewMode === "usns") {
+      fetchUsns();
+    }
+  }, [isLoaded, user, viewMode]);
+
+  const fetchUsns = async () => {
+    setIsUsnLoading(true);
+    try {
+      const res = await fetch("/api/admin/usns");
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setUsnList(data.usns);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsUsnLoading(false);
+    }
+  };
+
+  const handleBulkUsnUpload = async () => {
+    if (!bulkUsnInput.trim()) return;
+    setIsUploadingUsn(true);
+    try {
+      const splitUsns = bulkUsnInput
+        .split(/[\n,\s]+/)
+        .map((u) => u.trim().toUpperCase())
+        .filter(Boolean);
+
+      if (splitUsns.length === 0) {
+        alert("Please enter at least one valid USN.");
+        return;
+      }
+
+      const res = await fetch("/api/admin/usns", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ usns: splitUsns }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        alert(`Successfully authorized ${splitUsns.length} USNs!`);
+        setBulkUsnInput("");
+        fetchUsns();
+      } else {
+        alert(data.error || "Failed to upload USNs.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("A network error occurred while uploading USNs.");
+    } finally {
+      setIsUploadingUsn(false);
+    }
+  };
+
+  const handleDeleteUsn = async (usnToDelete: string) => {
+    if (!confirm(`Are you sure you want to remove USN '${usnToDelete}' from the pre-authorized list?`)) return;
+    try {
+      const res = await fetch(`/api/admin/usns?usn=${encodeURIComponent(usnToDelete)}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        fetchUsns();
+      } else {
+        alert(data.error || "Failed to delete USN.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("A network error occurred while deleting the USN.");
+    }
+  };
 
   // Fetch Tickets on mount
   useEffect(() => {
@@ -450,6 +534,19 @@ export default function AdminDashboard() {
             >
               Scanners
             </button>
+            <button
+              onClick={() => {
+                setViewMode("usns");
+                setScanResult(null);
+              }}
+              className={`px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                viewMode === "usns"
+                  ? "bg-[#EB0028] text-white"
+                  : "text-white/60 hover:text-white hover:bg-white/5"
+              }`}
+            >
+              USNs
+            </button>
           </div>
 
           <button
@@ -753,6 +850,130 @@ export default function AdminDashboard() {
               </div>
             </div>
           </section>
+        ) : viewMode === "usns" ? (
+          <section className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* USN Bulk Upload Box */}
+            <div className="lg:col-span-5 bg-zinc-950/60 border border-white/10 rounded-2xl p-6 backdrop-blur-md space-y-6 flex flex-col relative">
+              <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-[#EB0028]"></div>
+              <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-[#EB0028]"></div>
+              
+              <div className="space-y-1">
+                <h3 className="font-orbitron font-bold text-lg text-white uppercase tracking-wide flex items-center gap-2">
+                  <Fingerprint className="text-[#EB0028]" size={20} />
+                  Authorize USNs
+                </h3>
+                <p className="text-xs text-white/50 font-clash">
+                  Add student University Seat Numbers (USNs) to allow them to purchase tickets at student pricing.
+                </p>
+              </div>
+
+              <div className="space-y-4 flex-1 flex flex-col">
+                <div className="space-y-2 flex-1 flex flex-col">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-white/60 font-orbitron">
+                    Paste USNs in Bulk
+                  </label>
+                  <textarea
+                    rows={8}
+                    value={bulkUsnInput}
+                    onChange={(e) => setBulkUsnInput(e.target.value)}
+                    placeholder="Enter USNs separated by commas, spaces, or newlines&#10;e.g.&#10;1MS21CS001&#10;1MS21CS002, 1MS21CS003"
+                    className="w-full flex-1 min-h-[180px] bg-zinc-900 border border-white/10 rounded-xl p-4 text-sm text-white font-mono placeholder-white/20 focus:outline-none focus:border-[#EB0028] transition-colors resize-none"
+                  />
+                </div>
+
+                <button
+                  onClick={handleBulkUsnUpload}
+                  disabled={isUploadingUsn || !bulkUsnInput.trim()}
+                  className="w-full bg-[#EB0028] hover:bg-[#c30020] disabled:bg-zinc-800 disabled:text-white/40 text-white font-orbitron font-bold text-xs uppercase tracking-wider py-3.5 rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  {isUploadingUsn ? (
+                    <>
+                      <Loader2 className="animate-spin" size={16} />
+                      Saving USNs...
+                    </>
+                  ) : (
+                    <span>Add to Authorized List</span>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* USN List Table */}
+            <div className="lg:col-span-7 bg-zinc-950/60 border border-white/10 rounded-2xl p-6 backdrop-blur-md flex flex-col min-h-[400px] relative">
+              <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-[#EB0028]"></div>
+              <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-[#EB0028]"></div>
+
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-white/10">
+                <div className="space-y-1">
+                  <h3 className="font-orbitron font-bold text-lg text-white uppercase tracking-wide">
+                    Authorized List ({usnList.length})
+                  </h3>
+                  <p className="text-xs text-white/50 font-clash">
+                    Search and manage allowed student identifiers.
+                  </p>
+                </div>
+
+                {/* Search Bar */}
+                <div className="relative w-full sm:w-64">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-white/40">
+                    <Search size={16} />
+                  </span>
+                  <input
+                    type="text"
+                    placeholder="Search USN..."
+                    value={usnSearchQuery}
+                    onChange={(e) => setUsnSearchQuery(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2 bg-zinc-900 border border-white/10 rounded-lg text-xs font-mono text-white placeholder-white/30 focus:outline-none focus:border-[#EB0028] transition-colors"
+                  />
+                </div>
+              </div>
+
+              {/* Table Container */}
+              <div className="flex-1 overflow-y-auto max-h-[450px] mt-4 scrollbar-thin scrollbar-thumb-white/10">
+                {isUsnLoading ? (
+                  <div className="h-64 flex flex-col items-center justify-center text-white/50 gap-2">
+                    <Loader2 className="animate-spin text-[#EB0028]" size={28} />
+                    <p className="text-xs">Loading authorized list...</p>
+                  </div>
+                ) : usnList.length === 0 ? (
+                  <div className="h-64 flex flex-col items-center justify-center text-white/45 gap-2">
+                    <Fingerprint size={32} className="text-white/20" />
+                    <p className="text-xs font-semibold">No USNs authorized yet</p>
+                  </div>
+                ) : (
+                  <table className="w-full text-left font-clash text-xs border-collapse">
+                    <thead>
+                      <tr className="border-b border-white/5 bg-zinc-950/40 text-[10px] font-bold uppercase tracking-wider text-white/40 select-none">
+                        <th className="py-2.5 px-4 font-orbitron">USN</th>
+                        <th className="py-2.5 px-4 font-orbitron">Date Added</th>
+                        <th className="py-2.5 px-4 font-orbitron text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5 font-mono">
+                      {usnList
+                        .filter((u) => u.usn.toLowerCase().includes(usnSearchQuery.toLowerCase()))
+                        .map((u) => (
+                          <tr key={u.usn} className="hover:bg-white/[0.01] transition-colors">
+                            <td className="py-3 px-4 font-bold text-white tracking-wider">{u.usn}</td>
+                            <td className="py-3 px-4 text-white/50 text-[10px]">
+                              {new Date(u.created_at).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </td>
+                            <td className="py-3 px-4 text-right font-orbitron">
+                              <button
+                                onClick={() => handleDeleteUsn(u.usn)}
+                                className="text-red-500 hover:text-red-400 font-bold text-[9px] uppercase tracking-wider cursor-pointer"
+                              >
+                                Remove
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </div>
+          </section>
         ) : (
           <section className="bg-zinc-950/40 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-md shadow-2xl flex flex-col min-h-[500px]">
             {/* Controls Bar */}
@@ -841,6 +1062,11 @@ export default function AdminDashboard() {
                           <div className="font-semibold text-white">{ticket.name}</div>
                           <div className="text-xs text-white/50 mt-0.5 select-all">{ticket.email}</div>
                           <div className="text-xs text-white/50 font-mono mt-0.5 select-all">{ticket.phone}</div>
+                          {ticket.usn && (
+                            <div className="text-xs font-bold text-amber-400 mt-1 select-all font-mono">
+                              USN: {ticket.usn}
+                            </div>
+                          )}
                         </td>
                         <td className="py-4 px-6">
                           <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider
