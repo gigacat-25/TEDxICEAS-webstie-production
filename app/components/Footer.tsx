@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useTheme } from "./ThemeContext";
 import { venue } from "@/lib/venue";
+import Link from "next/link";
 
 export default function Footer({ startAnimation = false }: { startAnimation?: boolean }) {
   const [isInView, setIsInView] = useState(false);
@@ -177,9 +178,17 @@ export default function Footer({ startAnimation = false }: { startAnimation?: bo
             alt="TEDxICEAS"
             className="h-[24px] md:h-[40px]"
           />
-          <span className="font-tedxiceas text-[10px] -ml-3 md:text-[16px] lg:-ml-8 text-white/80 text-center leading-tight">
-            ©TEDxICEAS
-          </span>
+          <div className="flex flex-col items-center justify-center text-center">
+            <span className="font-tedxiceas text-[10px] md:text-[16px] text-white/80 leading-tight">
+              ©TEDxICEAS
+            </span>
+            <Link
+              href="/terms"
+              className="font-clash text-[8px] md:text-[11px] text-[#EB0028] hover:underline transition mt-1"
+            >
+              Terms & Privacy Policy
+            </Link>
+          </div>
           <div className="flex flex-col items-center gap-0.5">
             <span className="font-clash text-[8px] md:text-[14px] text-white/70 whitespace-nowrap">
               FOLLOW US ON.
