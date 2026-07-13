@@ -91,6 +91,58 @@ export default function TicketsPage() {
   const [usn, setUsn] = useState("");
   const [additionalAttendees, setAdditionalAttendees] = useState<{ name: string; email: string; usn: string }[]>([]);
   const [isValidatingUsn, setIsValidatingUsn] = useState(false);
+  const [usnStatus, setUsnStatus] = useState<"idle" | "verifying" | "valid" | "invalid">("idle");
+  const [usnStatusMessage, setUsnStatusMessage] = useState("");
+
+  // Debounced effect for checking USN
+  useEffect(() => {
+    if (selectedTicket?.type !== "Student") {
+      setUsnStatus("idle");
+      setUsnStatusMessage("");
+      return;
+    }
+
+    const cleanUsn = usn.trim();
+    if (cleanUsn.length < 5) {
+      setUsnStatus("idle");
+      setUsnStatusMessage("");
+      return;
+    }
+
+    setUsnStatus("verifying");
+    setUsnStatusMessage("Verifying USN...");
+
+    const delayDebounce = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/tickets/verify-usn?usn=${encodeURIComponent(cleanUsn)}`);
+        const data = await res.json();
+        
+        if (res.ok && data.success) {
+          if (data.valid) {
+            if (data.alreadyRegistered) {
+              setUsnStatus("invalid");
+              setUsnStatusMessage("This USN is already registered.");
+            } else {
+              setUsnStatus("valid");
+              setUsnStatusMessage("Valid student USN!");
+            }
+          } else {
+            setUsnStatus("invalid");
+            setUsnStatusMessage("Invalid or unauthorized student USN.");
+          }
+        } else {
+          setUsnStatus("invalid");
+          setUsnStatusMessage("Error checking USN.");
+        }
+      } catch (err) {
+        console.error(err);
+        setUsnStatus("invalid");
+        setUsnStatusMessage("Connection error.");
+      }
+    }, 600); // 600ms debounce
+
+    return () => clearTimeout(delayDebounce);
+  }, [usn, selectedTicket]);
 
   // Sync additional attendees array size to ticketCount - 1
   useEffect(() => {
@@ -187,6 +239,8 @@ export default function TicketsPage() {
     setPhone("");
     setTicketCount(1);
     setUsn("");
+    setUsnStatus("idle");
+    setUsnStatusMessage("");
     setAdditionalAttendees([]);
     setScreenshot(null);
     setScreenshotPreview(null);
@@ -221,8 +275,7 @@ export default function TicketsPage() {
   };
 
   // Validate Step 1
-  const handleNextStep = async () => {
-    if (isValidatingUsn) return;
+  const handleNextStep = () => {
     if (!name.trim()) {
       setErrorMessage("Please enter your full name.");
       return;
@@ -242,37 +295,14 @@ export default function TicketsPage() {
         setErrorMessage("Please enter your University Seat Number (USN).");
         return;
       }
-
-      setIsValidatingUsn(true);
-      setErrorMessage("");
-      try {
-        const res = await fetch(`/api/tickets/verify-usn?usn=${encodeURIComponent(usn.trim())}`);
-        const data = await res.json();
-        
-        if (!res.ok || !data.success) {
-          setErrorMessage(data.error || "Failed to verify USN. Please check your connection.");
-          setIsValidatingUsn(false);
-          return;
-        }
-
-        if (!data.valid) {
-          setErrorMessage(data.message || `The USN '${usn.toUpperCase()}' is not pre-authorized for student tickets. Please contact the administrator.`);
-          setIsValidatingUsn(false);
-          return;
-        }
-
-        if (data.alreadyRegistered) {
-          setErrorMessage(`The USN '${usn.toUpperCase()}' has already booked a ticket. Each student is allowed only one pass.`);
-          setIsValidatingUsn(false);
-          return;
-        }
-      } catch (err) {
-        console.error(err);
-        setErrorMessage("A network error occurred while verifying the USN.");
-        setIsValidatingUsn(false);
+      if (usnStatus === "verifying") {
+        setErrorMessage("Please wait while we verify your USN.");
         return;
       }
-      setIsValidatingUsn(false);
+      if (usnStatus !== "valid") {
+        setErrorMessage(usnStatusMessage || "Please enter a valid, authorized Student USN.");
+        return;
+      }
     }
 
     // Validate additional attendees
@@ -677,11 +707,29 @@ export default function TicketsPage() {
                         value={usn}
                         onChange={(e) => setUsn(e.target.value)}
                         placeholder="e.g. 1MS21CS001"
-                        className="w-full bg-zinc-900 border border-white/10 rounded-lg py-3 px-4 text-white font-clash placeholder-white/30 uppercase tracking-wider focus:outline-none focus:border-[#EB0028] transition-colors"
+                        className={`w-full bg-zinc-900 border rounded-lg py-3 px-4 text-white font-clash placeholder-white/30 uppercase tracking-wider focus:outline-none transition-colors
+                          ${usnStatus === "valid" ? "border-emerald-500/50 focus:border-emerald-500" :
+                            usnStatus === "invalid" ? "border-red-500/50 focus:border-red-500" :
+                            usnStatus === "verifying" ? "border-amber-500/50 focus:border-amber-500" :
+                            "border-white/10 focus:border-[#EB0028]"}
+                        `}
                       />
-                      <p className="text-[10px] text-white/40 font-clash">
-                        Only pre-authorized student USNs are permitted to purchase Student passes.
-                      </p>
+                      {usnStatusMessage ? (
+                        <p className={`text-xs font-semibold font-clash mt-1 flex items-center gap-1.5
+                          ${usnStatus === "valid" ? "text-emerald-400" :
+                            usnStatus === "invalid" ? "text-red-400" :
+                            "text-amber-400 animate-pulse"}
+                        `}>
+                          {usnStatus === "verifying" && <Loader2 size={12} className="animate-spin text-amber-400" />}
+                          {usnStatus === "valid" && <Check size={12} className="text-emerald-400" />}
+                          {usnStatus === "invalid" && <X size={12} className="text-red-400" />}
+                          {usnStatusMessage}
+                        </p>
+                      ) : (
+                        <p className="text-[10px] text-white/40 font-clash">
+                          Only pre-authorized student USNs are permitted to purchase Student passes.
+                        </p>
+                      )}
                     </div>
                   )}
 
