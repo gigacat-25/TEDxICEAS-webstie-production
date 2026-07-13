@@ -69,10 +69,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Clean and filter empty values
-    const cleanUsns = usns
-      .map((u) => u.trim().toUpperCase())
-      .filter(Boolean);
+    // Clean, filter empty values, and deduplicate
+    const cleanUsns = Array.from(
+      new Set(usns.map((u) => u.trim().toUpperCase()).filter(Boolean))
+    );
 
     if (cleanUsns.length === 0) {
       return NextResponse.json(
