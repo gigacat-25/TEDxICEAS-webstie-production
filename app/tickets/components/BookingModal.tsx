@@ -24,6 +24,7 @@ export default function BookingModal({
   onClose,
   selectedTicket,
 }: BookingModalProps) {
+  const isStudentTicket = selectedTicket?.type === "Impact College Students" || selectedTicket?.type === "Student";
   const [currentStep, setCurrentStep] = useState(1); // 1: Form, 2: Payment, 3: Success
 
   // Form Field States
@@ -64,7 +65,7 @@ export default function BookingModal({
 
   // Debounced effect for checking USN with active control flag to avoid race conditions
   useEffect(() => {
-    if (!selectedTicket || selectedTicket.type !== "Impact College Students") {
+    if (!selectedTicket || !isStudentTicket) {
       setUsnStatus("idle");
       setUsnStatusMessage("");
       return;
@@ -118,7 +119,7 @@ export default function BookingModal({
       active = false;
       clearTimeout(delayDebounce);
     };
-  }, [usn, selectedTicket]);
+  }, [usn, selectedTicket, isStudentTicket]);
 
   // Sync additional attendees array size to ticketCount - 1
   useEffect(() => {
@@ -175,7 +176,7 @@ export default function BookingModal({
     }
 
     // Validate USN if Category is Student
-    if (selectedTicket.type === "Impact College Students") {
+    if (isStudentTicket) {
       if (!usn.trim()) {
         setErrorMessage("Please enter your University Seat Number (USN).");
         return;
@@ -202,7 +203,7 @@ export default function BookingModal({
           setErrorMessage(`Please enter a valid email address for Attendee #${i + 2}.`);
           return;
         }
-        if (selectedTicket.type === "Impact College Students") {
+        if (isStudentTicket) {
           if (!att.usn || !att.usn.trim()) {
             setErrorMessage(`Please enter the University Seat Number (USN) for Attendee #${i + 2}.`);
             return;
@@ -240,7 +241,7 @@ export default function BookingModal({
       formData.append("pricePaid", totalAmount.toString());
       formData.append("screenshot", screenshot);
 
-      if (selectedTicket.type === "Impact College Students") {
+      if (isStudentTicket) {
         formData.append("usn", usn.trim().toUpperCase());
       }
 
@@ -409,7 +410,7 @@ export default function BookingModal({
                 </div>
 
                 {/* Student USN field */}
-                {selectedTicket.type === "Student" && (
+                {isStudentTicket && (
                   <div className="space-y-2">
                     <label className="block text-sm font-clash font-medium text-white/75">
                       University Seat Number (USN)
@@ -440,7 +441,7 @@ export default function BookingModal({
                       </p>
                     ) : (
                       <p className="text-xs text-white/50 font-clash">
-                        Only pre-authorized student USNs are permitted to purchase Student passes.
+                        Only pre-authorized student USNs are permitted to purchase Student/Impact College Student passes.
                       </p>
                     )}
                   </div>
@@ -451,7 +452,7 @@ export default function BookingModal({
                   <div>
                     <h4 className="font-clash font-semibold text-white">Quantity</h4>
                     <p className="text-xs text-white/50 font-clash mt-0.5">
-                      {selectedTicket.type === "Student"
+                      {isStudentTicket
                         ? "Student tickets are limited to 1 per booking"
                         : "Maximum 5 tickets per booking"}
                     </p>
@@ -459,17 +460,17 @@ export default function BookingModal({
                   <div className="flex items-center gap-4">
                     <button
                       onClick={() => setTicketCount(Math.max(1, ticketCount - 1))}
-                      disabled={ticketCount <= 1 || selectedTicket.type === "Student"}
+                      disabled={ticketCount <= 1 || isStudentTicket}
                       className="w-10 h-10 rounded-lg border border-white/10 flex items-center justify-center text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer"
                     >
                       <Minus size={16} />
                     </button>
                     <span className="font-orbitron font-bold text-lg text-white w-6 text-center">
-                      {selectedTicket.type === "Student" ? 1 : ticketCount}
+                      {isStudentTicket ? 1 : ticketCount}
                     </span>
                     <button
                       onClick={() => setTicketCount(Math.min(5, ticketCount + 1))}
-                      disabled={ticketCount >= 5 || selectedTicket.type === "Student"}
+                      disabled={ticketCount >= 5 || isStudentTicket}
                       className="w-10 h-10 rounded-lg border border-white/10 flex items-center justify-center text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer"
                     >
                       <Plus size={16} />
@@ -489,7 +490,7 @@ export default function BookingModal({
                           <p className="font-clash text-xs font-semibold text-[#EB0028] uppercase tracking-wider">
                             Attendee #{idx + 2}
                           </p>
-                          <div className={`grid grid-cols-1 ${selectedTicket.type === "Student" ? "md:grid-cols-3" : "md:grid-cols-2"} gap-3`}>
+                          <div className={`grid grid-cols-1 ${isStudentTicket ? "md:grid-cols-3" : "md:grid-cols-2"} gap-3`}>
                             <div className="space-y-1">
                               <label className="block text-xs font-clash text-white/60">
                                 Full Name
@@ -524,7 +525,7 @@ export default function BookingModal({
                                 className="w-full bg-zinc-950 border border-white/5 rounded-lg py-2 px-3 text-sm text-white font-clash placeholder-white/20 focus:outline-none focus:border-[#EB0028] transition-colors"
                               />
                             </div>
-                            {selectedTicket.type === "Student" && (
+                            {isStudentTicket && (
                               <div className="space-y-1">
                                 <label className="block text-xs font-clash text-white/60">
                                   USN
