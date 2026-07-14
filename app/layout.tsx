@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Orbitron } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
@@ -26,7 +26,15 @@ const clashDisplay = localFont({
   weight: "200 700",
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#000000",
+};
+
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://tedxiceas.com"),
   title: event.name,
   description: event.description,
   keywords: event.keywords,
@@ -34,7 +42,6 @@ export const metadata: Metadata = {
   creator: "TEDxICEAS",
   publisher: "TEDxICEAS",
   robots: "index, follow",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=5",
   openGraph: {
     type: "website",
     title: event.name,

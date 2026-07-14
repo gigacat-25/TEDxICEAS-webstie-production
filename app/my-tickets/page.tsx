@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useUser, UserButton } from "@clerk/nextjs";
-import { ArrowLeft, Loader2, QrCode, Printer, Ticket as TicketIcon, AlertTriangle, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Loader2, Printer, Ticket as TicketIcon, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import Footer from "../components/Footer";
@@ -136,7 +136,7 @@ export default function MyTicketsPage() {
             <div className="space-y-2">
               <h3 className="font-orbitron font-bold text-xl text-white">No Tickets Booked Yet</h3>
               <p className="font-clash text-sm text-white/50 leading-relaxed">
-                You haven't registered for any TEDxICEAS passes yet. Purchase one to secure your seat.
+                You haven&apos;t registered for any TEDxICEAS passes yet. Purchase one to secure your seat.
               </p>
             </div>
             <Link href="/tickets">
@@ -267,7 +267,7 @@ export default function MyTicketsPage() {
                             Checking bank records. Pass QR will generate here upon confirmation.
                           </p>
                           <p className="text-[9px] text-amber-400/80 font-sans max-w-[180px] leading-normal print:hidden">
-                            Note: Check your Spam or Promotions folder if you didn't receive your registration email.
+                            Note: Check your Spam or Promotions folder if you didn&apos;t receive your registration email.
                           </p>
                         </div>
                       )}

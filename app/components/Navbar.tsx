@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence, useScroll, useMotionValueEvent, Variants } from "framer-motion";
 import { useTheme } from "./ThemeContext";
 import { useCoreMetrics } from "./ThemeMetrics";
+import { useAuth } from "@clerk/nextjs";
 
 const navLinks = [
   { name: "MOSAIC", href: "/chat" },
@@ -28,10 +29,26 @@ const mobileItems = [
 
 const Navbar = ({ startAnimation = true }: { startAnimation?: boolean }) => {
   const pathname = usePathname();
+  const { isSignedIn } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showBookBtn, setShowBookBtn] = useState(false);
   const { scrollY } = useScroll();
   const { theme, toggleTheme } = useTheme();
+
+  const currentNavLinks = [
+    ...navLinks.slice(0, 5),
+    ...(isSignedIn ? [{ name: "MY TICKETS", href: "/my-tickets" }] : []),
+    ...navLinks.slice(5)
+  ];
+
+  const currentMobileItems = [
+    ...mobileItems.slice(0, 5),
+    ...(isSignedIn ? [{ id: "6", name: "MY TICKETS", href: "/my-tickets" }] : []),
+    ...mobileItems.slice(5).map((item) => ({
+      ...item,
+      id: isSignedIn ? "7" : "6"
+    }))
+  ];
 
   if (pathname === "/team") return null;
 
@@ -127,7 +144,7 @@ const Navbar = ({ startAnimation = true }: { startAnimation?: boolean }) => {
         {/* Desktop Navigation Links */}
         <div className="hidden md:flex items-center mt-1 mr-10">
           <div className="flex items-center gap-12">
-            {navLinks.map((link) => (
+            {currentNavLinks.map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
@@ -197,7 +214,7 @@ const Navbar = ({ startAnimation = true }: { startAnimation?: boolean }) => {
             {/* Menu Items */}
             <div className="flex-1 flex flex-col justify-start pt-24 px-8 overflow-y-auto">
               <div className="space-y-8">
-                {mobileItems.map((item, i) => (
+                {currentMobileItems.map((item, i) => (
                   <Link
                     key={item.name}
                     href={item.href}

@@ -1,15 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, ShieldAlert, Scale, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Scale, ShieldCheck } from "lucide-react";
 import { motion } from "framer-motion";
-import { useTheme } from "../components/ThemeContext";
 import Footer from "../components/Footer";
 
 export default function TermsAndPrivacyPage() {
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
-
   return (
     <main className="min-h-screen bg-black text-white selection:bg-[#EB0028] selection:text-white relative flex flex-col justify-between overflow-x-hidden">
       {/* Background Noise & Gradient */}
@@ -132,7 +128,7 @@ export default function TermsAndPrivacyPage() {
                   <strong className="text-white">Data Retention:</strong> All personal data collected will be permanently deleted from our servers within 30 days after the conclusion of the TEDxICEAS event, except where required for accounting or legal compliance.
                 </li>
                 <li>
-                  <strong className="text-white">Your Rights:</strong> As a "Data Principal" under the DPDP Act, you have the right to access your data, request correction of any inaccurate details, request erasure of your data, or withdraw your consent. To exercise these rights, email us at <a href="mailto:tedxiceas.alerts@gmail.com" className="text-[#EB0028] hover:underline font-semibold font-mono">tedxiceas.alerts@gmail.com</a>.
+                  <strong className="text-white">Your Rights:</strong> As a &quot;Data Principal&quot; under the DPDP Act, you have the right to access your data, request correction of any inaccurate details, request erasure of your data, or withdraw your consent. To exercise these rights, email us at <a href="mailto:tedxiceas.alerts@gmail.com" className="text-[#EB0028] hover:underline font-semibold font-mono">tedxiceas.alerts@gmail.com</a>.
                 </li>
               </ul>
             </div>
