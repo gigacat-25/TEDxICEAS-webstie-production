@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Student USN Validation
-    if (category === "Student") {
+    if (category === "Student" || category === "Impact College Students") {
       if (ticketCount !== 1) {
         return NextResponse.json(
           { success: false, error: "Student registrations are limited to exactly 1 ticket per booking." },

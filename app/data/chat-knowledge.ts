@@ -101,27 +101,27 @@ export const knowledgeBase: KnowledgeEntry[] = [
     id: "tickets-price",
     category: "Tickets",
     triggers: ["ticket", "price", "cost", "buy", "book", "register", "fee"],
-    patterns: [/how much (is|are|does)/i, /ticket (price|cost|fee)/i, /buy.*ticket/i, /book.*(now|ticket)/i, /(student|faculty).*(price|cost)/i, /purchase/i, /registration/i],
+    patterns: [/how much (is|are|does)/i, /ticket (price|cost|fee)/i, /buy.*ticket/i, /book.*(now|ticket)/i, /(student|attendee|faculty).*(price|cost)/i, /purchase/i, /registration/i],
     response:
-      "Here are the ticket prices:\n• **Student**: ₹799 (valid Student ID required)\n• **Faculty**: ₹1,099\n\nBook your tickets on the tickets page: /tickets",
+      "Here are the ticket prices:\n• **Impact College Students**: ₹499 (valid USN required)\n• **Attendees**: ₹599\n\nBook your tickets on the tickets page: /tickets",
     priority: 5,
   },
   {
     id: "tickets-student",
     category: "Tickets",
-    triggers: ["student ticket", "student discount", "student price"],
-    patterns: [/student.*(ticket|price|discount)/i, /(is there|any) student/i],
+    triggers: ["student ticket", "student discount", "student price", "impact college student"],
+    patterns: [/student.*(ticket|price|discount)/i, /(is there|any) student/i, /impact college.*student/i],
     response:
-      "Yes! Student tickets are **₹799**. You'll need to show a valid Student ID at entry. Book here: /tickets",
+      "Yes! Impact College Student tickets are **₹499**. You will need a valid USN to register. Book here: /tickets",
     priority: 2,
   },
   {
     id: "tickets-faculty",
     category: "Tickets",
-    triggers: ["faculty ticket", "professional", "general access"],
-    patterns: [/faculty.*(ticket|price)/i, /professional.*ticket/i, /general.*access/i],
+    triggers: ["attendees ticket", "faculty ticket", "professional", "general access"],
+    patterns: [/attendee.*(ticket|price)/i, /faculty.*(ticket|price)/i, /professional.*ticket/i, /general.*access/i],
     response:
-      "Faculty/professional tickets are **₹1,099**. Book here: /tickets",
+      "Attendee tickets are **₹599**. Book here: /tickets",
     priority: 2,
   },
   {

@@ -1070,7 +1070,7 @@ export default function AdminDashboard() {
                         </td>
                         <td className="py-4 px-6">
                           <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider
-                            ${ticket.category === "Faculty" 
+                            ${ticket.category === "Faculty" || ticket.category === "Attendees"
                               ? "bg-purple-500/10 text-purple-400 border border-purple-500/20" 
                               : "bg-blue-500/10 text-blue-400 border border-blue-500/20"
                             }

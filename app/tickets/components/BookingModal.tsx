@@ -64,7 +64,7 @@ export default function BookingModal({
 
   // Debounced effect for checking USN with active control flag to avoid race conditions
   useEffect(() => {
-    if (!selectedTicket || selectedTicket.type !== "Student") {
+    if (!selectedTicket || selectedTicket.type !== "Impact College Students") {
       setUsnStatus("idle");
       setUsnStatusMessage("");
       return;
@@ -175,7 +175,7 @@ export default function BookingModal({
     }
 
     // Validate USN if Category is Student
-    if (selectedTicket.type === "Student") {
+    if (selectedTicket.type === "Impact College Students") {
       if (!usn.trim()) {
         setErrorMessage("Please enter your University Seat Number (USN).");
         return;
@@ -202,7 +202,7 @@ export default function BookingModal({
           setErrorMessage(`Please enter a valid email address for Attendee #${i + 2}.`);
           return;
         }
-        if (selectedTicket.type === "Student") {
+        if (selectedTicket.type === "Impact College Students") {
           if (!att.usn || !att.usn.trim()) {
             setErrorMessage(`Please enter the University Seat Number (USN) for Attendee #${i + 2}.`);
             return;
@@ -240,7 +240,7 @@ export default function BookingModal({
       formData.append("pricePaid", totalAmount.toString());
       formData.append("screenshot", screenshot);
 
-      if (selectedTicket.type === "Student") {
+      if (selectedTicket.type === "Impact College Students") {
         formData.append("usn", usn.trim().toUpperCase());
       }
 
