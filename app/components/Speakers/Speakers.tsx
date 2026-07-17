@@ -56,7 +56,7 @@ const speakers: Speaker[] = [
   },
   {
     name: "Sanjay R",
-    title: "Community Manager, Google for Developers",
+    title: "Community Manager | District Rotaract Representative | RI District 3192",
     description: "Community builder, entrepreneur, and youth leader. MBA in Marketing with 5+ years in community growth. Serves as Community Manager at Google for Developers and Youngest District Rotaract Representative of Rotary International District 3192 (2026-27), having inspired 5,000+ young professionals.",
     img: "/speakers/sanjay-r.jpg",
   },

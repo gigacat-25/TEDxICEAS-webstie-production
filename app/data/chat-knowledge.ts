@@ -14,7 +14,7 @@ const speakersList = [
   { name: "Fazlur Rahman Khan", title: "Technical Trainer, Linux Foundation | Kubestronaut" },
   { name: "Dr. Ghazala Ahmed Shafi", title: "Chief Dental Surgeon | Laser Specialist of the Year" },
   { name: "Neole Anna Cornelio", title: "International Sprinter | Gold Medalist & Record Holder" },
-  { name: "Sanjay R", title: "Community Manager, Google for Developers | Youth Leader" },
+  { name: "Sanjay R", title: "Community Manager | District Rotaract Representative | RI District 3192" },
   { name: "Shweta Vohra", title: "Architecture Leader, Booking.com | Author & Inventor" },
 ]
 

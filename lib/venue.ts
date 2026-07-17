@@ -109,7 +109,7 @@ export const event = {
     },
     {
       name: "Sanjay R",
-      jobTitle: "Community Manager, Google for Developers",
+      jobTitle: "Community Manager | District Rotaract Representative | RI District 3192",
       description: "Community builder, entrepreneur, Youngest District Rotaract Representative, Community Manager at Google for Developers.",
       image: "https://tedxiceas.com/speakers/sanjay-r.jpg",
     },
