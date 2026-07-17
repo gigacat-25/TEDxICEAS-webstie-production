@@ -17,12 +17,50 @@ type Speaker = {
   img: string;
 };
 
-const speakers: Speaker[] = Array.from({ length: 10 }, () => ({
-  name: "Coming Soon",
-  title: "Speaker Announcement",
-  description: "Stay tuned for the reveal of our inspiring lineup of speakers for TEDxICEAS 2026. Something extraordinary is on the horizon.",
-  img: "/speakers/mystery.jpg",
-}));
+const speakers: Speaker[] = [
+  {
+    name: "Hospitality Leader",
+    title: "Hospitality Business Leader & Entrepreneur",
+    description: "A hospitality business leader with over a decade of experience in building, operating, and scaling premium restaurant and dining brands. Driven by empathy and purpose, he shares how seemingly ordinary people and moments in our lives profoundly shape who we become.",
+    img: "/speakers/hospitality-leader.jpg",
+  },
+  {
+    name: "Dr. Saheer Nelliparamban",
+    title: "Founder & CEO, Paywint | Forbes Council Member",
+    description: "Doctor, entrepreneur, Founder and CEO of Paywint, Fichecks, and Gasdeck, and a member of the Forbes Business Council. His journey spans healthcare, technology, fintech innovation, and entrepreneurship, offering valuable insights on leadership, resilience, and creating impact.",
+    img: "/speakers/dr-saheer-nelliparamban.jpg",
+  },
+  {
+    name: "Fazlur Rahman Khan",
+    title: "Technical Trainer, Linux Foundation | Kubestronaut",
+    description: "Technical Trainer at The Linux Foundation with 20+ years of experience across enterprise database architecture, cloud-native infrastructure, and technical education. India's first Technical Trainer, Course Maintainer, Author, and Kubestronaut holding all five active CNCF Kubernetes certifications.",
+    img: "/speakers/fazlur-rahman-khan.jpg",
+  },
+  {
+    name: "Dr. Ghazala Ahmed Shafi",
+    title: "Chief Dental Surgeon | Laser Specialist of the Year",
+    description: "Head and Chief Dental Surgeon at Dr. Ghazala’s Dental, Implant and Laser Centre with 17+ years of clinical and academic expertise. MDS in Periodontology, Laser Specialist of the Year 2022, and Top 100 Doctors in Doctors’ Choice Awards 2019, pioneering phototherapy in patient care.",
+    img: "/speakers/dr-ghazala-ahmed-shafi.jpg",
+  },
+  {
+    name: "Neole Anna Cornelio",
+    title: "International Sprinter | Gold Medalist & Record Holder",
+    description: "International sprinter who has represented India in the 4×100m relay at the Asian U20, World Athletics U20, and South Asian Junior Athletics Championships (gold medalist & national record holder). HYROX Women's Relay medalist and WWE tryout qualifier, dedicated to inspiring young athletes.",
+    img: "/speakers/neole-anna-cornelio.jpg",
+  },
+  {
+    name: "Sanjay R",
+    title: "Community Manager, Google for Developers",
+    description: "Community builder, entrepreneur, and youth leader. MBA in Marketing with 5+ years in community growth. Serves as Community Manager at Google for Developers and Youngest District Rotaract Representative of Rotary International District 3192 (2026-27), having inspired 5,000+ young professionals.",
+    img: "/speakers/sanjay-r.jpg",
+  },
+  {
+    name: "Shweta Vohra",
+    title: "Architecture Leader, Booking.com | Author & Inventor",
+    description: "Technology leader, author, inventor, and speaker with 24+ years of experience building cloud, platform, and AI systems across global enterprises. Architecture leader at Booking.com and author of Decoding Platform Engineering Patterns and Dear Software and AI Architect.",
+    img: "/speakers/shweta-vohra.jpg",
+  },
+];
 
 // Helper to wrap page index
 const wrap = (min: number, max: number, v: number): number => {

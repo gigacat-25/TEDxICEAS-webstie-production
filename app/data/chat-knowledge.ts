@@ -8,15 +8,13 @@ export interface KnowledgeEntry {
 }
 
 const speakersList = [
-  { name: "Pramodh Chandrashekar", title: "Founder of Coincontra & Last Ripple Foundation" },
-  { name: "Karen Vincent", title: "Standup Comedian | Entertainer | Influencer" },
-  { name: "Jonathan Thomas Jai", title: "Journalist | Writer" },
-  { name: "Rida Khan", title: "Content Creator" },
-  { name: "Prahalad Kulkarni", title: "Former Indian Air Force Veteran & Civil Servant" },
-  { name: "Tezashwani Tomar", title: "Senior Brand Manager" },
-  { name: "Prof. Ar. Vasanth K. Bhat", title: "Director of Impact School of Architecture" },
-  { name: "Dr. Bharat Bylappa", title: "Founder of Bharat Groups" },
-  { name: "Dr. Alice Abraham", title: "President of IMPACT Group of Institutions" },
+  { name: "Hospitality Leader", title: "Hospitality Business Leader & Entrepreneur" },
+  { name: "Dr. Saheer Nelliparamban", title: "Founder & CEO, Paywint | Forbes Council Member" },
+  { name: "Fazlur Rahman Khan", title: "Technical Trainer, Linux Foundation | Kubestronaut" },
+  { name: "Dr. Ghazala Ahmed Shafi", title: "Chief Dental Surgeon | Laser Specialist of the Year" },
+  { name: "Neole Anna Cornelio", title: "International Sprinter | Gold Medalist & Record Holder" },
+  { name: "Sanjay R", title: "Community Manager, Google for Developers | Youth Leader" },
+  { name: "Shweta Vohra", title: "Architecture Leader, Booking.com | Author & Inventor" },
 ]
 
 const performersList = []
@@ -81,7 +79,7 @@ export const knowledgeBase: KnowledgeEntry[] = [
     category: "Speakers",
     triggers: ["speaker", "who is", "lineup", "talks", "performers"],
     patterns: [/who (is |are |'s )?(speaking|the speakers)/i, /list of speakers/i, /speaker lineup/i, /who.*talk/i, /any speaker/i, /performers/i, /lineup/i],
-    response: `TEDxICEAS 2026 features **9 inspiring speakers**:\n${speakersList.map((s) => `• **${s.name}** — ${s.title}`).join("\n")}\n\nEach speaker brings a unique perspective on what shapes us.`,
+    response: `TEDxICEAS 2026 features **7 inspiring speakers**:\n${speakersList.map((s) => `• **${s.name}** — ${s.title}`).join("\n")}\n\nEach speaker brings a unique perspective on what shapes us.`,
     priority: 4,
   },
   ...speakersList.map(
