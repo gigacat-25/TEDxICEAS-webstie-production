@@ -19,6 +19,12 @@ type Speaker = {
 
 const speakers: Speaker[] = [
   {
+    name: "Huda Thamanna",
+    title: "Content Creator",
+    description: "Huda Thamanna is a content creator whose journey is rooted in authenticity, creativity, and connection. By transforming everyday moments into meaningful stories, she has cultivated a community that values honesty, growth, and self-expression. At TEDxICEAS, she brings her perspective on navigating life while staying true to oneself.",
+    img: "/speakers/huda-thamanna.jpg",
+  },
+  {
     name: "Arun Prasanna",
     title: "Hospitality Business Leader & Entrepreneur",
     description: "A hospitality business leader with over a decade of experience in building, operating, and scaling premium restaurant and dining brands. Driven by empathy and purpose, he shares how seemingly ordinary people and moments in our lives profoundly shape who we become.",

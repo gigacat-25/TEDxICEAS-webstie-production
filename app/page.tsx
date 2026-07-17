@@ -5,7 +5,7 @@ import { event } from "@/lib/venue";
 export const metadata: Metadata = {
   title: "TEDxICEAS 2026 | What shapes us? | Official TEDx Event Bengaluru",
   description:
-    "Join TEDxICEAS 2026 at Visvesvaraya Auditorium, Impact College of Engineering, Sahakar Nagar, Bengaluru. Featuring inspiring talks from Arun Prasanna, Dr. Saheer Nelliparamban, Fazlur Rahman Khan, Dr. Ghazala Ahmed Shafi, Neole Anna Cornelio, Sanjay R, Shweta Vohra & more.",
+    "Join TEDxICEAS 2026 at Visvesvaraya Auditorium, Impact College of Engineering, Sahakar Nagar, Bengaluru. Featuring inspiring talks from Huda Thamanna, Arun Prasanna, Dr. Saheer Nelliparamban, Fazlur Rahman Khan, Dr. Ghazala Ahmed Shafi, Neole Anna Cornelio, Sanjay R, Shweta Vohra & more.",
   keywords: event.keywords,
   alternates: {
     canonical: "https://tedxiceas.com",

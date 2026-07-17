@@ -8,6 +8,7 @@ export interface KnowledgeEntry {
 }
 
 const speakersList = [
+  { name: "Huda Thamanna", title: "Content Creator" },
   { name: "Arun Prasanna", title: "Hospitality Business Leader & Entrepreneur" },
   { name: "Dr. Saheer Nelliparamban", title: "Founder & CEO, Paywint | Forbes Council Member" },
   { name: "Fazlur Rahman Khan", title: "Technical Trainer, Linux Foundation | Kubestronaut" },
@@ -79,7 +80,7 @@ export const knowledgeBase: KnowledgeEntry[] = [
     category: "Speakers",
     triggers: ["speaker", "who is", "lineup", "talks", "performers"],
     patterns: [/who (is |are |'s )?(speaking|the speakers)/i, /list of speakers/i, /speaker lineup/i, /who.*talk/i, /any speaker/i, /performers/i, /lineup/i],
-    response: `TEDxICEAS 2026 features **7 inspiring speakers**:\n${speakersList.map((s) => `• **${s.name}** — ${s.title}`).join("\n")}\n\nEach speaker brings a unique perspective on what shapes us.`,
+    response: `TEDxICEAS 2026 features **8 inspiring speakers**:\n${speakersList.map((s) => `• **${s.name}** — ${s.title}`).join("\n")}\n\nEach speaker brings a unique perspective on what shapes us.`,
     priority: 4,
   },
   ...speakersList.map(
