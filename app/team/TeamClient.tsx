@@ -15,19 +15,22 @@ type TeamMember = {
 
 const coreTeam: TeamMember[] = [
   { name: "Thejaswin P", role: "Lead Organizer and Licensee", image: "/team/Thejaswin P.jpg" },
+  { name: "Mohammed Raif", role: "Co Organizer", image: "/team/Raif.jpg" },
   { name: "Samuel Melvin", role: "Event Manager", image: "/team/Samuel Melvin.jpeg" },
   { name: "Joshua Nikhil", role: "Event Producer & Sponsorship Lead", image: "/team/Joshua.jpg" },
   { name: "Saraswati Nag H", role: "Event Co Producer", image: "/team/Saraswathi Nag.jpg" },
+  { name: "Aarcha U", role: "Curation Team Lead", image: "/team/Aarcha.jpg" },
+  { name: "Dhayan Balagopal", role: "Sponsorship Team Co-Lead", image: "/team/Dhyan.jpg" },
+  { name: "Joann Debi R", role: "Logistics Lead", image: "/team/Joann Debi.jpg" },
   { name: "Syed Saihan Zaheer Hussainy", role: "Marketing Team Lead", image: "/team/Saihaan.jpg" },
   { name: "Irthiqua Zain", role: "Marketing Team Lead", image: "/team/Zain.jpg" },
-  { name: "Dhayan Balagopal", role: "Sponsorship Team Co-Lead", image: "/team/Dhyan.jpg" },
-  { name: "Aarcha U", role: "Curation Team Lead", image: "/team/Aarcha.jpg" },
+  { name: "Mohammed arshan", role: "Design Lead", image: "/team/arshan.jpg" },
+  { name: "Mohammed Muddasir", role: "Design Co-Lead", image: "/team/Mohammed Mudassir.jpg" },
+  { name: "Arshad khan", role: "Social Media Team Lead", image: "/team/Arshad Khaif.jpg" },
+  { name: "Abdul Muneem", role: "Social Media Team Co-Lead", image: "/team/muneem.jpeg" },
   { name: "Mohammed Sauwam", role: "Production Team Lead", image: "/team/Sauwam.jpg" },
-  { name: "Joann Debi R", role: "Logistics Lead", image: "/team/Joann Debi.jpg" },
   { name: "Mohammed Rumaiz Sakardey", role: "Hospitality Team Lead", image: "/team/Rumaiz.jpg" },
-  { name: "Yogitha", role: "Hospitality Co-Lead", image: "/team/Yogita.jpg" },
-  { name: "Arshad Khaif", role: "Social Media Team Lead", image: "/team/Arshad Khaif.jpg" },
-  { name: "Mohammed Muddasir", role: "Design Co-Lead", image: "/team/Mohammed Mudassir.jpg" }
+  { name: "Yogitha", role: "Hospitality Co-Lead", image: "/team/Yogita.jpg" }
 ];
 
 const facultyCoordinators: TeamMember[] = [

@@ -154,7 +154,7 @@ export const knowledgeBase: KnowledgeEntry[] = [
     triggers: ["team", "organizer", "who runs", "who organizes", "committee", "lead organizer"],
     patterns: [/who (organizes|runs|is behind)/i, /organizing team/i, /core team/i, /volunteer/i, /lead organizer/i, /organizer name/i],
     response:
-      "TEDxICEAS is organized by a dedicated team of students and faculty from Impact College of Engineering and Applied Sciences.\n\n• **Thejaswin P** is the Lead Organizer and Licensee.\n• **Samuel Melvin** is the Event Manager.\n• **Joshua Nikhil** is the Event Producer & Sponsorship Lead.\n• **Saraswati Nag H** is the Event Co-Producer.\n\nYou can visit the **Team** page to learn more about our core team, leads, faculty coordinators, and volunteers!",
+      "TEDxICEAS is organized by a dedicated team of students and faculty from Impact College of Engineering and Applied Sciences.\n\n• **Thejaswin P** is the Lead Organizer and Licensee.\n• **Mohammed Raif** is the Co Organizer.\n• **Samuel Melvin** is the Event Manager.\n• **Joshua Nikhil** is the Event Producer & Sponsorship Lead.\n• **Saraswati Nag H** is the Event Co-Producer.\n\nYou can visit the **Team** page to learn more about our core team, leads, faculty coordinators, and volunteers!",
     priority: 2,
   },
   {
