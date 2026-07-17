@@ -14,13 +14,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/tickets",
     "/sponsors",
     "/team",
+    "/chat",
     "/terms",
   ];
 
   return routes.map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: currentDate,
-    changeFrequency: "weekly" as const,
-    priority: route === "" ? 1.0 : route === "/tickets" ? 0.9 : 0.8,
+    changeFrequency: route === "" ? ("daily" as const) : ("weekly" as const),
+    priority: route === "" ? 1.0 : route === "/tickets" ? 0.9 : route === "/about" ? 0.8 : 0.7,
   }));
 }

@@ -8,7 +8,7 @@ export interface KnowledgeEntry {
 }
 
 const speakersList = [
-  { name: "Hospitality Leader", title: "Hospitality Business Leader & Entrepreneur" },
+  { name: "Arun Prasanna", title: "Hospitality Business Leader & Entrepreneur" },
   { name: "Dr. Saheer Nelliparamban", title: "Founder & CEO, Paywint | Forbes Council Member" },
   { name: "Fazlur Rahman Khan", title: "Technical Trainer, Linux Foundation | Kubestronaut" },
   { name: "Dr. Ghazala Ahmed Shafi", title: "Chief Dental Surgeon | Laser Specialist of the Year" },

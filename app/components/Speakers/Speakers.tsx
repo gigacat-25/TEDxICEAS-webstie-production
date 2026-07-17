@@ -19,10 +19,10 @@ type Speaker = {
 
 const speakers: Speaker[] = [
   {
-    name: "Hospitality Leader",
+    name: "Arun Prasanna",
     title: "Hospitality Business Leader & Entrepreneur",
     description: "A hospitality business leader with over a decade of experience in building, operating, and scaling premium restaurant and dining brands. Driven by empathy and purpose, he shares how seemingly ordinary people and moments in our lives profoundly shape who we become.",
-    img: "/speakers/hospitality-leader.jpg",
+    img: "/speakers/arun-prasanna.jpg",
   },
   {
     name: "Dr. Saheer Nelliparamban",

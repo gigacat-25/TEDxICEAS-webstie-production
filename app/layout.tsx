@@ -35,33 +35,50 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://tedxiceas.com"),
-  title: event.name,
+  title: {
+    default: "TEDxICEAS 2026 | What shapes us? | Official TEDx Event Bengaluru",
+    template: "%s | TEDxICEAS 2026",
+  },
   description: event.description,
   keywords: event.keywords,
-  authors: [{ name: "TEDxICEAS" }],
+  authors: [{ name: "TEDxICEAS Team" }],
   creator: "TEDxICEAS",
   publisher: "TEDxICEAS",
-  robots: "index, follow",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: "https://tedxiceas.com",
+  },
   openGraph: {
     type: "website",
-    title: event.name,
+    title: "TEDxICEAS 2026 | What shapes us? | Official TEDx Event Bengaluru",
     description: event.description,
+    url: "https://tedxiceas.com",
+    siteName: "TEDxICEAS",
     images: [
       {
-        url: "/logo-white.png",
+        url: "https://tedxiceas.com/logo-white.png",
         width: 1200,
         height: 630,
-        alt: "TEDxICEAS - What shapes us?",
+        alt: "TEDxICEAS 2026 - What shapes us? Event in Bengaluru",
       },
     ],
     locale: "en_US",
-    siteName: "TEDxICEAS",
   },
   twitter: {
     card: "summary_large_image",
-    title: event.name,
+    title: "TEDxICEAS 2026 | What shapes us?",
     description: event.description,
-    images: ["/logo-white.png"],
+    images: ["https://tedxiceas.com/logo-white.png"],
     creator: "@TEDxICEAS",
   },
 };
@@ -71,16 +88,24 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const structuredData = {
+  const eventStructuredData = {
     "@context": "https://schema.org",
     "@type": "Event",
-    name: "TEDxICEAS - What shapes us?",
+    name: "TEDxICEAS 2026 - What shapes us?",
+    alternateName: ["TEDxICEAS", "TEDx ICEAS", "TEDx ICEAS 2026", "TEDx Bengaluru 2026"],
     description:
-      "TEDxICEAS - What shapes us? An exclusive gathering of innovative minds at Visvesvaraya Auditorium, Impact College of Engineering and Applied Sciences, Bengaluru.",
+      "TEDxICEAS 2026 is an independently organized TEDx event under license from TED. Theme: 'What shapes us?'. Held at Visvesvaraya Auditorium, Impact College of Engineering and Applied Sciences, Bengaluru.",
     startDate: event.startDate,
     endDate: event.endDate,
-    eventAttendanceMode: "OfflineEventAttendanceMode",
-    eventStatus: "EventScheduled",
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+    eventStatus: "https://schema.org/EventScheduled",
+    url: "https://tedxiceas.com",
+    image: [
+      "https://tedxiceas.com/logo-white.png",
+      "https://tedxiceas.com/speakers/hospitality-leader.jpg",
+      "https://tedxiceas.com/speakers/dr-saheer-nelliparamban.jpg",
+      "https://tedxiceas.com/speakers/fazlur-rahman-khan.jpg",
+    ],
     location: {
       "@type": "Place",
       name: venue.name,
@@ -92,12 +117,57 @@ export default function RootLayout({
         postalCode: venue.postalCode,
         addressCountry: venue.country,
       },
+      geo: {
+        "@type": "GeoCoordinates",
+        latitude: venue.coordinates.lat,
+        longitude: venue.coordinates.lng,
+      },
     },
     organizer: {
       "@type": "Organization",
       name: "TEDxICEAS",
+      url: "https://tedxiceas.com",
+      email: "tedxiceas@gmail.com",
     },
-    image: ["/logo-white.png"],
+    performer: event.speakers.map((sp) => ({
+      "@type": "Person",
+      name: sp.name,
+      jobTitle: sp.jobTitle,
+      description: sp.description,
+      image: sp.image,
+    })),
+    offers: [
+      {
+        "@type": "Offer",
+        name: "Impact College Student Pass",
+        price: "499",
+        priceCurrency: "INR",
+        url: "https://tedxiceas.com/tickets",
+        availability: "https://schema.org/InStock",
+        validFrom: "2026-01-01",
+      },
+      {
+        "@type": "Offer",
+        name: "Attendee Pass",
+        price: "599",
+        priceCurrency: "INR",
+        url: "https://tedxiceas.com/tickets",
+        availability: "https://schema.org/InStock",
+        validFrom: "2026-01-01",
+      },
+    ],
+  };
+
+  const websiteStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "TEDxICEAS",
+    url: "https://tedxiceas.com",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: "https://tedxiceas.com/search?q={search_term_string}",
+      "query-input": "required name=search_term_string",
+    },
   };
 
   return (
@@ -106,7 +176,11 @@ export default function RootLayout({
         <head>
           <script
             type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(eventStructuredData) }}
+          />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteStructuredData) }}
           />
           <meta name="theme-color" content="#000000" />
           <meta property="og:type" content="website" />
