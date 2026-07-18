@@ -5,15 +5,31 @@ import { useTheme } from "./ThemeContext";
 import { venue } from "@/lib/venue";
 import Link from "next/link";
 
-export default function Footer({ startAnimation = false }: { startAnimation?: boolean }) {
-  const [isInView, setIsInView] = useState(false);
+export default function Footer({ startAnimation = true }: { startAnimation?: boolean }) {
+  const [isInView, setIsInView] = useState(startAnimation);
   const footerRef = useRef<HTMLElement>(null);
   const { theme } = useTheme();
 
   useEffect(() => {
     if (startAnimation) {
       setIsInView(true);
+      return;
     }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (footerRef.current) {
+      observer.observe(footerRef.current);
+    }
+
+    return () => observer.disconnect();
   }, [startAnimation]);
 
   const isDark = theme === "dark";

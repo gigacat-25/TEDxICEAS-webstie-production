@@ -10,6 +10,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const routes = [
     "",
+    "/speakers",
     "/about",
     "/tickets",
     "/sponsors",
@@ -21,7 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return routes.map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: currentDate,
-    changeFrequency: route === "" ? ("daily" as const) : ("weekly" as const),
-    priority: route === "" ? 1.0 : route === "/tickets" ? 0.9 : route === "/about" ? 0.8 : 0.7,
+    changeFrequency: route === "" || route === "/speakers" ? ("daily" as const) : ("weekly" as const),
+    priority: route === "" ? 1.0 : route === "/speakers" || route === "/tickets" ? 0.9 : route === "/about" ? 0.8 : 0.7,
   }));
 }

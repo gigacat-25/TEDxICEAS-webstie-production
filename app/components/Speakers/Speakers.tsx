@@ -9,6 +9,7 @@ gsap.registerPlugin(Draggable);
 import SpeakersMarquee from "./SpeakersMarquee";
 import { ChevronLeft, ChevronRight, ChevronUp } from "lucide-react";
 import { useTheme } from "../ThemeContext";
+import Link from "next/link";
 
 type Speaker = {
   name: string;
@@ -682,9 +683,17 @@ export default function Newspeakers({
                   ref={speakersHeaderRef}
                   className="flex items-center justify-between gap-6 opacity-0 mt-0 "
                 >
-                  <h2 className="uppercase text-sm sm:text-base md:text-lg font-[600] font-clash">
-                    Speakers.2026
-                  </h2>
+                  <div className="flex items-center gap-4">
+                    <h2 className="uppercase text-sm sm:text-base md:text-lg font-[600] font-clash">
+                      Speakers.2026
+                    </h2>
+                    <Link
+                      href="/speakers"
+                      className="hidden sm:inline-flex items-center gap-1 text-xs font-clash text-[#EB0028] hover:underline font-semibold tracking-wider"
+                    >
+                      View All Speakers &rarr;
+                    </Link>
+                  </div>
 
                   {/* Header Controls (Nav Buttons) */}
                   <div className="flex gap-4">
