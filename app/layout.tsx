@@ -172,7 +172,7 @@ export default function RootLayout({
 
   return (
     <ClerkProvider>
-      <html lang="en" suppressHydrationWarning={true} className="snap-y snap-proximity">
+      <html lang="en" suppressHydrationWarning={true}>
         <head>
           <script
             type="application/ld+json"

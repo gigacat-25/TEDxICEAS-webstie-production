@@ -93,18 +93,36 @@ CREATE INDEX IF NOT EXISTS idx_tickets_clerk_user_id ON public.tickets(clerk_use
 CREATE INDEX IF NOT EXISTS idx_authorized_usns_usn ON public.authorized_usns(usn);
 
 
--- 5. STORAGE BUCKET SETUP (Payment Screenshots)
--- Create bucket if it doesn't already exist
+-- 5. ROW LEVEL SECURITY (RLS) & SECURITY POLICIES
+-- Enables Row Level Security to eliminate Supabase security warnings
+ALTER TABLE public.tickets ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.authorized_usns ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.event_settings ENABLE ROW LEVEL SECURITY;
+
+-- Allow full access to backend API routes (service_role)
+DROP POLICY IF EXISTS "Service Role Full Access Tickets" ON public.tickets;
+CREATE POLICY "Service Role Full Access Tickets" ON public.tickets FOR ALL USING (true);
+
+DROP POLICY IF EXISTS "Service Role Full Access Authorized USNs" ON public.authorized_usns;
+CREATE POLICY "Service Role Full Access Authorized USNs" ON public.authorized_usns FOR ALL USING (true);
+
+DROP POLICY IF EXISTS "Service Role Full Access Event Settings" ON public.event_settings;
+CREATE POLICY "Service Role Full Access Event Settings" ON public.event_settings FOR ALL USING (true);
+
+
+-- 6. STORAGE BUCKET SETUP (Payment Screenshots)
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('payment-screenshots', 'payment-screenshots', true)
 ON CONFLICT (id) DO NOTHING;
 
 -- Grant public read access to payment screenshots bucket
+DROP POLICY IF EXISTS "Public Read Access" ON storage.objects;
 CREATE POLICY "Public Read Access" 
 ON storage.objects FOR SELECT 
 USING (bucket_id = 'payment-screenshots');
 
--- Enable service role & authenticated users upload access
+-- Enable upload access to payment screenshots bucket
+DROP POLICY IF EXISTS "Allow Uploads" ON storage.objects;
 CREATE POLICY "Allow Uploads" 
 ON storage.objects FOR INSERT 
 WITH CHECK (bucket_id = 'payment-screenshots');

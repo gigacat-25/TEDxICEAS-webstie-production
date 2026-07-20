@@ -90,12 +90,11 @@ export default function TicketsPage() {
   };
 
   useGSAP(() => {
-    const tl = gsap.timeline();
-
     // Intro Animation: Title & Subtitle
+    const tl = gsap.timeline();
     tl.fromTo(
       titleRef.current,
-      { y: 100, opacity: 0, clipPath: "polygon(0 100%, 100% 100%, 100% 100%, 0 100%)" },
+      { y: 60, opacity: 0, clipPath: "polygon(0 100%, 100% 100%, 100% 100%, 0 100%)" },
       {
         y: 0,
         opacity: 1,
@@ -106,28 +105,30 @@ export default function TicketsPage() {
     ).fromTo(
       subtitleRef.current,
       { y: 20, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.8, ease: "power2.out" },
-    ).fromTo(
+      { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" },
+      "-=0.4"
+    );
+
+    // Cards Animation
+    gsap.fromTo(
       ".ticket-card",
       {
-        y: 80,
+        y: 60,
         opacity: 0,
-        scale: 0.9,
-        rotateX: -15,
-        transformPerspective: 1000
+        scale: 0.95,
       },
       {
         y: 0,
         opacity: 1,
         scale: 1,
-        rotateX: 0,
-        duration: 0.5,
+        duration: 0.6,
+        stagger: 0.15,
         ease: "power3.out",
         scrollTrigger: {
           trigger: cardsRef.current,
-          start: "top 85%",
+          start: "top 90%",
         },
-      },
+      }
     );
 
     ScrollTrigger.create({
@@ -136,6 +137,7 @@ export default function TicketsPage() {
       onEnter: () => setFooterInView(true),
     });
 
+    ScrollTrigger.refresh();
   }, { scope: containerRef });
 
   // Availability & Capacity State
@@ -155,13 +157,22 @@ export default function TicketsPage() {
         }
       } catch (err) {
         console.error("Failed to fetch ticket availability:", err);
+      } finally {
+        setTimeout(() => ScrollTrigger.refresh(), 200);
       }
     }
     fetchAvailability();
   }, []);
 
   useEffect(() => {
+    // Ensure document body overflow is completely unblocked
+    document.body.style.overflow = "unset";
+    document.body.style.overflowX = "hidden";
     window.scrollTo(0, 0);
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
   }, []);
 
   // Handle booking start
@@ -262,7 +273,7 @@ export default function TicketsPage() {
           {tickets.map((t) => ({ ...t, soldOut: isSoldOut || (remainingSeats !== null && remainingSeats <= 0) })).map((ticket, index) => (
             <motion.div
               key={index}
-              className="ticket-card opacity-0 relative group p-8 border backdrop-blur-sm flex flex-col justify-between min-h-[400px] w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] transition-all duration-300 bg-black/50 border-white/20 hover:border-white/50"
+              className="ticket-card relative group p-8 border backdrop-blur-sm flex flex-col justify-between min-h-[400px] w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] transition-all duration-300 bg-black/50 border-white/20 hover:border-white/50"
             >
               {/* Card Content */}
               <div>
