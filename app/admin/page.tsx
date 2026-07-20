@@ -19,7 +19,8 @@ import {
   Utensils,
   Gift,
   ScanLine,
-  Fingerprint
+  Fingerprint,
+  Pencil
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -83,6 +84,56 @@ export default function AdminDashboard() {
   const [isActionLoading, setIsActionLoading] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
   const [showRejectForm, setShowRejectForm] = useState(false);
+
+  // Settings / Seat Capacity States
+  const [totalSeats, setTotalSeats] = useState<number>(100);
+  const [showCapacityModal, setShowCapacityModal] = useState(false);
+  const [newCapacityInput, setNewCapacityInput] = useState<string>("100");
+  const [isSavingCapacity, setIsSavingCapacity] = useState(false);
+
+  const fetchSettings = async () => {
+    try {
+      const res = await fetch("/api/admin/settings");
+      const data = await res.json();
+      if (res.ok && data.success && data.total_seats) {
+        setTotalSeats(data.total_seats);
+        setNewCapacityInput(String(data.total_seats));
+      }
+    } catch (err) {
+      console.error("Failed to fetch admin settings:", err);
+    }
+  };
+
+  const handleSaveCapacity = async () => {
+    const val = parseInt(newCapacityInput, 10);
+    if (isNaN(val) || val <= 0) {
+      alert("Please enter a valid seat capacity (positive number).");
+      return;
+    }
+
+    setIsSavingCapacity(true);
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ total_seats: val }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setTotalSeats(data.total_seats);
+        setShowCapacityModal(false);
+        alert(`Successfully updated total seat capacity to ${data.total_seats}!`);
+      } else {
+        alert(data.error || "Failed to update seat capacity.");
+      }
+    } catch (err) {
+      console.error("Save capacity error:", err);
+      alert("Network error occurred while saving seat capacity.");
+    } finally {
+      setIsSavingCapacity(false);
+    }
+  };
 
   // USN Management States
   const [usnList, setUsnList] = useState<{ usn: string; created_at: string }[]>([]);
@@ -176,6 +227,7 @@ export default function AdminDashboard() {
   const fetchTickets = async () => {
     setIsLoading(true);
     setDataError("");
+    fetchSettings();
     try {
       const res = await fetch("/api/admin/tickets");
       const data = await res.json();
@@ -550,6 +602,18 @@ export default function AdminDashboard() {
           </div>
 
           <button
+            onClick={() => {
+              setNewCapacityInput(String(totalSeats));
+              setShowCapacityModal(true);
+            }}
+            className="inline-flex items-center gap-1.5 px-3 py-2 border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer shadow-sm"
+            title="Edit Amount of Tickets Available"
+          >
+            <Pencil size={13} />
+            <span className="hidden sm:inline">Set Ticket Limit ({totalSeats})</span>
+          </button>
+
+          <button
             onClick={fetchTickets}
             disabled={isLoading}
             className="p-2 border border-white/10 hover:border-white/30 hover:bg-white/5 rounded-lg text-white/70 hover:text-white transition-all cursor-pointer disabled:opacity-50"
@@ -565,52 +629,82 @@ export default function AdminDashboard() {
       <main className="relative z-10 flex-1 max-w-[1440px] mx-auto w-full p-6 md:p-10 space-y-8">
         
         {/* Metrics Grid */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-zinc-950/60 border border-white/10 rounded-xl p-6 backdrop-blur-sm flex items-center justify-between shadow-lg">
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="bg-zinc-950/60 border border-white/10 rounded-xl p-5 backdrop-blur-sm flex items-center justify-between shadow-lg">
             <div>
               <p className="text-white/50 text-xs font-semibold uppercase tracking-wider">Total Revenue</p>
-              <h3 className="text-3xl font-orbitron font-black text-emerald-400 mt-2">
+              <h3 className="text-2xl font-orbitron font-black text-emerald-400 mt-1.5">
                 ₹{metrics.totalRevenue.toLocaleString()}
               </h3>
             </div>
-            <div className="w-12 h-12 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/20">
-              <DollarSign size={22} />
+            <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/20">
+              <DollarSign size={20} />
             </div>
           </div>
 
-          <div className="bg-zinc-950/60 border border-white/10 rounded-xl p-6 backdrop-blur-sm flex items-center justify-between shadow-lg">
+          <div className="bg-zinc-950/60 border border-white/10 rounded-xl p-5 backdrop-blur-sm flex items-center justify-between shadow-lg relative group">
             <div>
-              <p className="text-white/50 text-xs font-semibold uppercase tracking-wider">Tickets Approved</p>
-              <h3 className="text-3xl font-orbitron font-black text-white mt-2">
+              <div className="flex items-center gap-1.5">
+                <p className="text-white/50 text-xs font-semibold uppercase tracking-wider">Seat Capacity</p>
+                <button
+                  onClick={() => {
+                    setNewCapacityInput(String(totalSeats));
+                    setShowCapacityModal(true);
+                  }}
+                  className="text-amber-400 hover:text-amber-300 hover:bg-amber-400/10 p-1 rounded transition-colors cursor-pointer"
+                  title="Edit Total Seat Capacity"
+                >
+                  <Pencil size={12} />
+                </button>
+              </div>
+              <h3 className="text-2xl font-orbitron font-black text-amber-400 mt-1.5">
+                {metrics.totalTicketsSold + metrics.pendingCount} <span className="text-xs font-normal text-white/50">/ {totalSeats}</span>
+              </h3>
+              <div className="w-full bg-zinc-900 rounded-full h-1.5 mt-2 overflow-hidden border border-white/10">
+                <div 
+                  className="bg-gradient-to-r from-amber-500 to-[#EB0028] h-full rounded-full transition-all duration-500" 
+                  style={{ width: `${Math.min(100, Math.round(((metrics.totalTicketsSold + metrics.pendingCount) / totalSeats) * 100))}%` }}
+                />
+              </div>
+            </div>
+            <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-400 border border-amber-500/20">
+              <Users size={20} />
+            </div>
+          </div>
+
+          <div className="bg-zinc-950/60 border border-white/10 rounded-xl p-5 backdrop-blur-sm flex items-center justify-between shadow-lg">
+            <div>
+              <p className="text-white/50 text-xs font-semibold uppercase tracking-wider">Approved</p>
+              <h3 className="text-2xl font-orbitron font-black text-white mt-1.5">
                 {metrics.totalTicketsSold}
               </h3>
             </div>
-            <div className="w-12 h-12 rounded-lg bg-white/5 flex items-center justify-center text-white/80 border border-white/10">
-              <Users size={22} />
+            <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-white/80 border border-white/10">
+              <Check size={20} />
             </div>
           </div>
 
-          <div className="bg-zinc-950/60 border border-white/10 rounded-xl p-6 backdrop-blur-sm flex items-center justify-between shadow-lg">
+          <div className="bg-zinc-950/60 border border-white/10 rounded-xl p-5 backdrop-blur-sm flex items-center justify-between shadow-lg">
             <div>
-              <p className="text-white/50 text-xs font-semibold uppercase tracking-wider">Pending Approval</p>
-              <h3 className={`text-3xl font-orbitron font-black mt-2 ${metrics.pendingCount > 0 ? "text-amber-400 animate-pulse" : "text-white/60"}`}>
+              <p className="text-white/50 text-xs font-semibold uppercase tracking-wider">Pending</p>
+              <h3 className={`text-2xl font-orbitron font-black mt-1.5 ${metrics.pendingCount > 0 ? "text-amber-400 animate-pulse" : "text-white/60"}`}>
                 {metrics.pendingCount}
               </h3>
             </div>
-            <div className="w-12 h-12 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-400 border border-amber-500/20">
-              <AlertCircle size={22} />
+            <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-400 border border-amber-500/20">
+              <AlertCircle size={20} />
             </div>
           </div>
 
-          <div className="bg-zinc-950/60 border border-white/10 rounded-xl p-6 backdrop-blur-sm flex items-center justify-between shadow-lg">
+          <div className="bg-zinc-950/60 border border-white/10 rounded-xl p-5 backdrop-blur-sm flex items-center justify-between shadow-lg">
             <div>
-              <p className="text-white/50 text-xs font-semibold uppercase tracking-wider">Rejected Requests</p>
-              <h3 className="text-3xl font-orbitron font-black text-red-400 mt-2">
+              <p className="text-white/50 text-xs font-semibold uppercase tracking-wider">Rejected</p>
+              <h3 className="text-2xl font-orbitron font-black text-red-400 mt-1.5">
                 {metrics.rejectedCount}
               </h3>
             </div>
-            <div className="w-12 h-12 rounded-lg bg-red-500/10 flex items-center justify-center text-red-400 border border-red-500/20">
-              <X size={22} />
+            <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center text-red-400 border border-red-500/20">
+              <X size={20} />
             </div>
           </div>
         </section>
@@ -1063,7 +1157,7 @@ export default function AdminDashboard() {
                           <div className="text-xs text-white/50 mt-0.5 select-all">{ticket.email}</div>
                           <div className="text-xs text-white/50 font-mono mt-0.5 select-all">{ticket.phone}</div>
                           {ticket.usn && (
-                            <div className="text-xs font-bold text-amber-400 mt-1 select-all font-mono">
+                            <div className="inline-block mt-1 px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[11px] font-mono font-bold tracking-wider select-all">
                               USN: {ticket.usn}
                             </div>
                           )}
@@ -1237,6 +1331,18 @@ export default function AdminDashboard() {
                         <span className="font-semibold text-white">{selectedTicket.ticket_count} Ticket(s)</span>
                       </div>
                     </div>
+                    {selectedTicket.usn ? (
+                      <div className="p-3 bg-amber-500/10 border border-amber-500/25 rounded-xl flex flex-col gap-0.5">
+                        <span className="text-amber-400/80 text-[10px] uppercase font-bold tracking-wider font-orbitron">Verified Student USN</span>
+                        <span className="text-base font-mono font-black text-amber-300 select-all tracking-wider">{selectedTicket.usn}</span>
+                      </div>
+                    ) : (
+                      (selectedTicket.category === "Student" || selectedTicket.category === "Impact College Students") && (
+                        <div className="p-2.5 bg-red-500/10 border border-red-500/20 rounded-lg">
+                          <span className="text-red-400/90 text-xs font-medium block">USN Not Recorded / General Registration</span>
+                        </div>
+                      )
+                    )}
                     <div>
                       <span className="text-white/40 block">Total Amount Expected</span>
                       <span className="text-lg font-bold text-[#EB0028] font-orbitron">₹{selectedTicket.price_paid}</span>
@@ -1345,6 +1451,93 @@ export default function AdminDashboard() {
                     </button>
                   )}
                 </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+
+
+      {/* Edit Seat Capacity Modal */}
+      <AnimatePresence>
+        {showCapacityModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md overflow-y-auto"
+            onClick={() => {
+              if (!isSavingCapacity) setShowCapacityModal(false);
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 10 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 10 }}
+              className="relative w-full max-w-md bg-zinc-950 border border-white/10 rounded-2xl p-6 md:p-8 shadow-2xl space-y-6 my-8"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setShowCapacityModal(false)}
+                disabled={isSavingCapacity}
+                className="absolute top-6 right-6 text-white/50 hover:text-white hover:bg-white/10 p-2 rounded-full transition-colors cursor-pointer"
+              >
+                <X size={20} />
+              </button>
+
+              <div className="border-b border-white/10 pb-4">
+                <span className="text-xs uppercase font-bold tracking-widest text-[#EB0028] font-orbitron">
+                  Event Settings
+                </span>
+                <h3 className="text-xl font-orbitron font-bold text-white mt-1">
+                  Edit Amount of Tickets Available
+                </h3>
+                <p className="text-xs text-white/50 font-clash mt-1">
+                  Set the total quantity of tickets/seats available for TEDxICEAS 2026. This value immediately updates public booking rules and seat limits.
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold uppercase text-white/70 font-orbitron mb-1.5">
+                    Total Seat Limit
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={newCapacityInput}
+                    onChange={(e) => setNewCapacityInput(e.target.value)}
+                    className="w-full bg-zinc-900 border border-white/15 rounded-xl p-4 text-xl font-orbitron font-bold text-amber-400 focus:outline-none focus:border-[#EB0028]"
+                  />
+                  <p className="text-[11px] text-white/40 font-clash mt-1.5">
+                    Currently reserved: <strong className="text-white">{metrics.totalTicketsSold + metrics.pendingCount}</strong> seats.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 pt-4 border-t border-white/10">
+                <button
+                  onClick={() => setShowCapacityModal(false)}
+                  disabled={isSavingCapacity}
+                  className="w-full bg-transparent border border-white/20 hover:border-white text-white font-clash py-3 rounded-lg text-xs font-semibold uppercase transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveCapacity}
+                  disabled={isSavingCapacity || !newCapacityInput.trim()}
+                  className="w-full bg-[#EB0028] hover:bg-[#c30020] text-white font-clash py-3 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  {isSavingCapacity ? (
+                    <>
+                      <Loader2 size={14} className="animate-spin" />
+                      <span>Saving...</span>
+                    </>
+                  ) : (
+                    <span>Save Capacity</span>
+                  )}
+                </button>
               </div>
             </motion.div>
           </motion.div>

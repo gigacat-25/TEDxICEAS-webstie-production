@@ -102,7 +102,7 @@ export const knowledgeBase: KnowledgeEntry[] = [
     triggers: ["ticket", "price", "cost", "buy", "book", "register", "fee"],
     patterns: [/how much (is|are|does)/i, /ticket (price|cost|fee)/i, /buy.*ticket/i, /book.*(now|ticket)/i, /(student|attendee|faculty).*(price|cost)/i, /purchase/i, /registration/i],
     response:
-      "Here are the ticket prices:\n• **Impact College Students**: ₹499 (valid USN required)\n• **Attendees**: ₹599\n\nBook your tickets on the tickets page: /tickets",
+      "Here are the ticket prices (Total capacity is strictly limited to 100 seats):\n• **Impact College Students**: ₹499 (valid USN required)\n• **Attendees**: ₹599\n\nBook your tickets on the tickets page: /tickets",
     priority: 5,
   },
   {
@@ -126,10 +126,10 @@ export const knowledgeBase: KnowledgeEntry[] = [
   {
     id: "tickets-sold-out",
     category: "Tickets",
-    triggers: ["sold out", "available", "availability"],
-    patterns: [/sold out/i, /still available/i, /any tickets left/i],
+    triggers: ["sold out", "available", "availability", "limit", "capacity"],
+    patterns: [/sold out/i, /still available/i, /any tickets left/i, /seat limit/i, /capacity/i],
     response:
-      "Tickets are currently available! Check the tickets page for real-time availability: /tickets",
+      "TEDxICEAS 2026 has a strict venue capacity limit of **100 seats only**. Check real-time availability and book your pass here: /tickets",
     priority: 2,
   },
   {

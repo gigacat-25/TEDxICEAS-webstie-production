@@ -17,12 +17,14 @@ interface BookingModalProps {
   isOpen: boolean;
   onClose: () => void;
   selectedTicket: TicketCategory | null;
+  remainingSeats?: number;
 }
 
 export default function BookingModal({
   isOpen,
   onClose,
   selectedTicket,
+  remainingSeats = 100,
 }: BookingModalProps) {
   const isStudentTicket = selectedTicket?.type === "Impact College Students" || selectedTicket?.type === "Student";
   const [currentStep, setCurrentStep] = useState(1); // 1: Form, 2: Payment, 3: Success
@@ -161,6 +163,16 @@ export default function BookingModal({
   // Validate Step 1
   const handleNextStep = () => {
     if (!selectedTicket) return;
+
+    if (remainingSeats <= 0) {
+      setErrorMessage("Tickets are sold out. The 100 seat limit has been reached.");
+      return;
+    }
+
+    if (ticketCount > remainingSeats) {
+      setErrorMessage(`Only ${remainingSeats} seat(s) remaining out of the 100 total seats. Please adjust ticket count.`);
+      return;
+    }
 
     if (!name.trim()) {
       setErrorMessage("Please enter your full name.");
@@ -454,7 +466,7 @@ export default function BookingModal({
                     <p className="text-xs text-white/50 font-clash mt-0.5">
                       {isStudentTicket
                         ? "Student tickets are limited to 1 per booking"
-                        : "Maximum 5 tickets per booking"}
+                        : `Max 5 per booking (${remainingSeats} seat(s) remaining out of 100 limit)`}
                     </p>
                   </div>
                   <div className="flex items-center gap-4">
@@ -469,8 +481,8 @@ export default function BookingModal({
                       {isStudentTicket ? 1 : ticketCount}
                     </span>
                     <button
-                      onClick={() => setTicketCount(Math.min(5, ticketCount + 1))}
-                      disabled={ticketCount >= 5 || isStudentTicket}
+                      onClick={() => setTicketCount(Math.min(Math.min(5, remainingSeats), ticketCount + 1))}
+                      disabled={ticketCount >= Math.min(5, remainingSeats) || isStudentTicket}
                       className="w-10 h-10 rounded-lg border border-white/10 flex items-center justify-center text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer"
                     >
                       <Plus size={16} />

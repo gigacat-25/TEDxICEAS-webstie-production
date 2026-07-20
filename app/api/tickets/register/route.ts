@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { sendPendingConfirmationEmail } from "@/lib/email";
 import { auth } from "@clerk/nextjs/server";
+import { getDynamicTotalSeats } from "@/app/api/admin/settings/route";
 
 export async function POST(req: NextRequest) {
   try {
@@ -35,6 +36,37 @@ export async function POST(req: NextRequest) {
 
     const ticketCount = parseInt(ticketCountStr, 10);
     const pricePaid = parseFloat(pricePaidStr);
+
+    // Enforce Dynamic Seat Capacity Limit
+    const MAX_SEATS = await getDynamicTotalSeats();
+    const { count: currentBookedCount, error: countError } = await supabaseAdmin
+      .from("tickets")
+      .select("*", { head: true, count: "exact" })
+      .in("status", ["pending", "approved"]);
+
+    if (countError) {
+      console.error("Seat limit check database error:", countError);
+      return NextResponse.json(
+        { success: false, error: "Failed to verify seat availability." },
+        { status: 500 }
+      );
+    }
+
+    const currentBooked = currentBookedCount || 0;
+    if (currentBooked >= MAX_SEATS) {
+      return NextResponse.json(
+        { success: false, error: `Tickets are completely sold out! The ${MAX_SEATS} seat capacity limit has been reached.` },
+        { status: 400 }
+      );
+    }
+
+    if (currentBooked + ticketCount > MAX_SEATS) {
+      const remaining = MAX_SEATS - currentBooked;
+      return NextResponse.json(
+        { success: false, error: `Only ${remaining} seat(s) remaining out of the ${MAX_SEATS} total capacity. You requested ${ticketCount} seat(s).` },
+        { status: 400 }
+      );
+    }
 
     // Validate email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -206,7 +238,7 @@ export async function POST(req: NextRequest) {
       status: "pending",
       clerk_user_id: userId,
       group_id: groupId,
-      usn: category === "Student" && usn ? usn.trim().toUpperCase() : null,
+      usn: usn ? usn.trim().toUpperCase() : null,
     });
 
     // Add Additional Attendees
@@ -222,7 +254,7 @@ export async function POST(req: NextRequest) {
         status: "pending",
         clerk_user_id: userId,
         group_id: groupId,
-        usn: category === "Student" && att.usn ? att.usn.trim().toUpperCase() : null,
+        usn: att.usn ? att.usn.trim().toUpperCase() : null,
       });
     }
 

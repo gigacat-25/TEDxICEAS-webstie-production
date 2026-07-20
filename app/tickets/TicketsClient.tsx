@@ -44,12 +44,16 @@ const tickets: TicketCategory[] = [
 
 const faqs = [
   {
+    question: "What is the total capacity / seat limit for the event?",
+    answer: "TEDxICEAS 2026 has a strict limit of 100 seats in total. Once all 100 tickets are booked, registration will automatically close.",
+  },
+  {
     question: "How can I find out more about the speakers or the event schedule?",
     answer: "You can visit the TEDxICEAS website or follow our social media channels for updates on the event schedule and speaker lineup.",
   },
   {
     question: "Is there a limit to the number of tickets I can buy?",
-    answer: "Yes, you can purchase up to 5 tickets per transaction. If you need more, you can make another purchase.",
+    answer: "Yes, you can purchase up to 5 tickets per transaction (or subject to remaining seats out of the 100 seat limit). If you need more, you can make another purchase.",
   },
   {
     question: "When will I receive my ticket?",
@@ -134,6 +138,28 @@ export default function TicketsPage() {
 
   }, { scope: containerRef });
 
+  // Availability & Capacity State
+  const [totalSeats, setTotalSeats] = useState<number>(100);
+  const [remainingSeats, setRemainingSeats] = useState<number | null>(null);
+  const [isSoldOut, setIsSoldOut] = useState(false);
+
+  useEffect(() => {
+    async function fetchAvailability() {
+      try {
+        const res = await fetch("/api/tickets/availability");
+        const data = await res.json();
+        if (res.ok && data.success) {
+          setRemainingSeats(data.remainingSeats);
+          setIsSoldOut(data.isSoldOut);
+          if (data.totalSeats) setTotalSeats(data.totalSeats);
+        }
+      } catch (err) {
+        console.error("Failed to fetch ticket availability:", err);
+      }
+    }
+    fetchAvailability();
+  }, []);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -215,6 +241,14 @@ export default function TicketsPage() {
 
         {/* Header */}
         <div className="text-center mb-20">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#EB0028]/30 bg-[#EB0028]/10 text-[#EB0028] font-orbitron text-xs md:text-sm font-semibold tracking-widest mb-6 uppercase">
+            <span>Limit: {totalSeats} Seats Available</span>
+            {remainingSeats !== null && (
+              <span className="text-white/80 font-clash font-normal">
+                ({remainingSeats} {remainingSeats === 1 ? "seat" : "seats"} remaining)
+              </span>
+            )}
+          </div>
           <h1 ref={titleRef} className="font-orbitron font-black text-5xl md:text-7xl lg:text-8xl tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500">
             GET YOUR <span className="text-[#EB0028]">TICKETS</span>
           </h1>
@@ -225,7 +259,7 @@ export default function TicketsPage() {
 
         {/* Ticket Cards Grid */}
         <div ref={cardsRef} className="flex flex-wrap justify-center gap-6 mb-32 max-w-7xl mx-auto">
-          {tickets.map((ticket, index) => (
+          {tickets.map((t) => ({ ...t, soldOut: isSoldOut || (remainingSeats !== null && remainingSeats <= 0) })).map((ticket, index) => (
             <motion.div
               key={index}
               className="ticket-card opacity-0 relative group p-8 border backdrop-blur-sm flex flex-col justify-between min-h-[400px] w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] transition-all duration-300 bg-black/50 border-white/20 hover:border-white/50"
@@ -343,6 +377,7 @@ export default function TicketsPage() {
             isOpen={isModalOpen}
             onClose={closeModal}
             selectedTicket={selectedTicket}
+            remainingSeats={remainingSeats ?? 100}
           />
         )}
       </AnimatePresence>
