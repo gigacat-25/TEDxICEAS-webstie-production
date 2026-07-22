@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { Plus, Minus, X, Upload, Check, Loader2, CreditCard } from "lucide-react";
+import { Plus, Minus, X, Upload, Check, Loader2, CreditCard, ExternalLink, Smartphone } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface TicketCategory {
@@ -289,9 +289,9 @@ export default function BookingModal({
   }, [selectedTicket, ticketCount]);
 
   const upiLink = useMemo(() => {
-    return selectedTicket 
-      ? `upi://pay?pa=${upiId}&pn=${encodeURIComponent(upiName)}&am=${totalAmount}&cu=INR` 
-      : "";
+    if (!selectedTicket) return "";
+    const note = encodeURIComponent(`TEDxICEAS ${selectedTicket.type} Pass`);
+    return `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(upiName)}&am=${totalAmount}&cu=INR&tn=${note}`;
   }, [selectedTicket, upiId, upiName, totalAmount]);
 
   const qrCodeUrl = useMemo(() => {
@@ -592,6 +592,41 @@ export default function BookingModal({
             {/* Step 2: Payment Section */}
             {currentStep === 2 && (
               <div className="space-y-6">
+                {/* Pay via UPI App Action Box */}
+                <div className="bg-gradient-to-r from-zinc-900 via-zinc-900 to-[#18181b] border border-[#EB0028]/30 rounded-xl p-4 md:p-5 shadow-lg space-y-3.5">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-[10px] uppercase font-orbitron font-bold text-[#EB0028] tracking-widest block">
+                        Fast & Direct Payment
+                      </span>
+                      <h4 className="text-base md:text-lg font-orbitron font-bold text-white">
+                        Pay via UPI App
+                      </h4>
+                    </div>
+                    <span className="px-2.5 py-1 rounded-full bg-[#EB0028]/10 border border-[#EB0028]/30 text-[11px] font-clash text-[#EB0028] font-semibold">
+                      GPay • PhonePe • Paytm
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-white/60 font-clash leading-relaxed">
+                    Click below to open Google Pay, PhonePe, Paytm, BHIM, or any UPI app with pre-filled details.
+                  </p>
+
+                  <a
+                    href={upiLink}
+                    target="_self"
+                    className="w-full bg-gradient-to-r from-[#EB0028] to-[#ff2b4a] hover:from-[#c30020] hover:to-[#eb0028] text-white font-clash py-3.5 px-5 rounded-lg font-bold text-sm md:text-base shadow-md flex items-center justify-center gap-2 transition-all transform active:scale-[0.98] cursor-pointer"
+                  >
+                    <Smartphone size={18} />
+                    <span>Pay ₹{totalAmount} via UPI App</span>
+                    <ExternalLink size={16} />
+                  </a>
+
+                  <div className="text-[11px] font-clash text-white/50 pt-1 border-t border-white/5">
+                    <span>Scan QR code below if using Desktop</span>
+                  </div>
+                </div>
+
                 {/* Payment Details Container */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
                   {/* QR Code Container */}
@@ -614,28 +649,28 @@ export default function BookingModal({
                         <CreditCard size={14} className="text-[#EB0028]" />
                         Payment Details
                       </div>
-                      <div className="space-y-1 font-clash text-sm">
-                        <div className="flex justify-between">
+                      <div className="space-y-1.5 font-clash text-sm">
+                        <div className="flex justify-between items-center">
                           <span className="text-white/50">Amount:</span>
                           <span className="text-white font-semibold">₹{totalAmount}</span>
                         </div>
-                        <div className="flex justify-between">
+                        <div className="flex justify-between items-center">
                           <span className="text-white/50">UPI ID:</span>
                           <span className="text-white font-mono select-all">{upiId}</span>
                         </div>
-                        <div className="flex justify-between">
+                        <div className="flex justify-between items-center">
                           <span className="text-white/50">Name:</span>
                           <span className="text-white">{upiName}</span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="text-xs text-white/50 font-clash leading-relaxed">
-                      <p className="font-semibold text-white/80 mb-1">Steps:</p>
-                      1. Scan the QR code or pay to the UPI ID.<br />
-                      2. Transfer the exact amount of <strong className="text-white">₹{totalAmount}</strong>.<br />
-                      3. Take a screenshot showing transaction status, amount, and UTR/Transaction ID.<br />
-                      4. Upload the screenshot below and click Submit.
+                    <div className="text-xs text-white/50 font-clash leading-relaxed bg-zinc-900/50 p-3 rounded-lg border border-white/5">
+                      <p className="font-semibold text-white/80 mb-1">Payment & Proof Steps:</p>
+                      1. Click <strong className="text-white">&quot;Pay ₹{totalAmount} via UPI App&quot;</strong> above (or scan QR).<br />
+                      2. Complete the payment in your UPI app.<br />
+                      3. Take a screenshot of the successful payment receipt.<br />
+                      4. Upload the screenshot below & click <strong className="text-[#EB0028]">&quot;Submit Booking&quot;</strong>.
                     </div>
                   </div>
                 </div>
