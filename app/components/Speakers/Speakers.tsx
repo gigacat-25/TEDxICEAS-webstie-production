@@ -67,6 +67,24 @@ const speakers: Speaker[] = [
     description: "Technology leader, author, inventor, and speaker with 24+ years of experience building cloud, platform, and AI systems across global enterprises. Architecture leader at Booking.com and author of Decoding Platform Engineering Patterns and Dear Software and AI Architect.",
     img: "/speakers/shweta-vohra.jpg",
   },
+  {
+    name: "Dr. Lokesh B",
+    title: "Senior Consultant in Neurology, Aster CMI Hospital",
+    description: "Senior Consultant in Neurology at Aster CMI Hospital, Bangalore with MBBS, MD, and DM in Neurology. Specializes in diagnosing and treating complex disorders of the brain, spinal cord, nerves, and muscles.",
+    img: "/speakers/dr-lokesh-b.jpg",
+  },
+  {
+    name: "Manish Kankaria",
+    title: "Founder, Bombay Kulfi | Entrepreneur & CA",
+    description: "Founder of Bombay Kulfi Ice Creams, transforming traditional Indian desserts into a 100+ outlet national brand with international presence in Singapore. Chartered Accountant combining business acumen with authentic innovation.",
+    img: "/speakers/manish-kankaria.jpg",
+  },
+  {
+    name: "Kapil Ahuja",
+    title: "CTO of Ventures & Studios, Nagarro | Author & Architect",
+    description: "CTO of Ventures and Studios at Nagarro and writer at HowToArchitect.io. Dedicated to architecting tech systems, leading high-performing teams, and exploring principles that shape human-centered innovation and leadership.",
+    img: "/speakers/kapil-ahuja.jpg",
+  },
 ];
 
 // Helper to wrap page index

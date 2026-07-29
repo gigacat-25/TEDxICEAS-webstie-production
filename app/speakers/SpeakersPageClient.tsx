@@ -92,6 +92,33 @@ export const speakersData: SpeakerDetail[] = [
     img: "/speakers/shweta-vohra.jpg",
     highlights: ["Booking.com Tech Leader", "24+ Years Systems Architect", "Published Author & Inventor"],
   },
+  {
+    id: "dr-lokesh-b",
+    name: "Dr. Lokesh B",
+    title: "Senior Consultant in Neurology, Aster CMI Hospital",
+    category: "Medicine & Healthcare",
+    bio: "Dr. Lokesh B is a Senior Consultant in Neurology at Aster CMI Hospital, Bangalore. He holds an MBBS, MD, and DM in Neurology, and specializes in the diagnosis and treatment of disorders affecting the brain, spinal cord, nerves, and muscles. With his extensive expertise in neurology, he is dedicated to providing comprehensive and advanced neurological care to his patients.",
+    img: "/speakers/dr-lokesh-b.jpg",
+    highlights: ["Senior Consultant Neurology", "Aster CMI Hospital", "MBBS, MD, DM Neurology"],
+  },
+  {
+    id: "manish-kankaria",
+    name: "Manish Kankaria",
+    title: "Founder, Bombay Kulfi | Entrepreneur & CA",
+    category: "Business & Leadership",
+    bio: "Manish Kankaria is the Founder of Bombay Kulfi Ice Creams, a brand that has transformed the way India experiences one of its most beloved traditional desserts. A Chartered Accountant by profession, Manish combined business acumen with a deep appreciation for authenticity to launch Bombay Kulfi in 2015. What began as a single outlet in Coimbatore has grown into a thriving brand with 100+ outlets, three national awards, and an international presence in Singapore.",
+    img: "/speakers/manish-kankaria.jpg",
+    highlights: ["Founder Bombay Kulfi", "100+ Outlets & Global Brand", "Chartered Accountant & Entrepreneur"],
+  },
+  {
+    id: "kapil-ahuja",
+    name: "Kapil Ahuja",
+    title: "CTO of Ventures & Studios, Nagarro | Author & Architect",
+    category: "Engineering & Systems",
+    bio: "Kapil Ahuja is the CTO of Ventures and Studios at Nagarro, where he has spent his career asking one enduring question: How do you architect something well? What began as a quest to build better technology systems evolved into leading high-performing teams and exploring principles that shape a meaningful life. Alongside his work in tech, Kapil writes at HowToArchitect.io, sharing perspectives on innovation, leadership, and personal growth.",
+    img: "/speakers/kapil-ahuja.jpg",
+    highlights: ["CTO Nagarro Ventures & Studios", "HowToArchitect.io Author", "Systems Architecture & Leadership"],
+  },
 ];
 
 const categories = ["All", "Media & Content", "Business & Leadership", "Fintech & Healthcare", "Technology & Cloud", "Medicine & Healthcare", "Sports & Performance", "Community & Tech", "Engineering & Systems"];

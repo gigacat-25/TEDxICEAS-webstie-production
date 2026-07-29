@@ -16,6 +16,9 @@ const speakersList = [
   { name: "Neole Anna Cornelio", title: "International Sprinter | Gold Medalist & Record Holder" },
   { name: "Sanjay R", title: "Community Manager | District Rotaract Representative | RI District 3192" },
   { name: "Shweta Vohra", title: "Architecture Leader, Booking.com | Author & Inventor" },
+  { name: "Dr. Lokesh B", title: "Senior Consultant in Neurology, Aster CMI Hospital" },
+  { name: "Manish Kankaria", title: "Founder, Bombay Kulfi | Entrepreneur & CA" },
+  { name: "Kapil Ahuja", title: "CTO of Ventures & Studios, Nagarro | Author & Architect" },
 ]
 
 const performersList = []
@@ -80,7 +83,7 @@ export const knowledgeBase: KnowledgeEntry[] = [
     category: "Speakers",
     triggers: ["speaker", "who is", "lineup", "talks", "performers"],
     patterns: [/who (is |are |'s )?(speaking|the speakers)/i, /list of speakers/i, /speaker lineup/i, /who.*talk/i, /any speaker/i, /performers/i, /lineup/i],
-    response: `TEDxICEAS 2026 features **8 inspiring speakers**:\n${speakersList.map((s) => `• **${s.name}** — ${s.title}`).join("\n")}\n\nEach speaker brings a unique perspective on what shapes us.`,
+    response: `TEDxICEAS 2026 features **11 inspiring speakers**:\n${speakersList.map((s) => `• **${s.name}** — ${s.title}`).join("\n")}\n\nEach speaker brings a unique perspective on what shapes us.`,
     priority: 4,
   },
   ...speakersList.map(

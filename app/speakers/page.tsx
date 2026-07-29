@@ -5,7 +5,7 @@ import { event } from "@/lib/venue";
 export const metadata: Metadata = {
   title: "Official Speakers 2026 | Lineup & Bios | TEDxICEAS Bengaluru",
   description:
-    "Discover the official speaker lineup for TEDxICEAS 2026. Read full bios and profiles for Huda Thamanna, Arun Prasanna, Dr. Saheer Nelliparamban, Fazlur Rahman Khan, Dr. Ghazala Ahmed Shafi, Neole Anna Cornelio, Sanjay R, Shweta Vohra.",
+    "Discover the official speaker lineup for TEDxICEAS 2026. Read full bios and profiles for Huda Thamanna, Arun Prasanna, Dr. Saheer Nelliparamban, Fazlur Rahman Khan, Dr. Ghazala Ahmed Shafi, Neole Anna Cornelio, Sanjay R, Shweta Vohra, Dr. Lokesh B, Manish Kankaria, and Kapil Ahuja.",
   keywords: event.keywords,
   alternates: {
     canonical: "https://tedxiceas.com/speakers",
