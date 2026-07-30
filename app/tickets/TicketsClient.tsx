@@ -25,10 +25,10 @@ interface TicketCategory {
 
 const tickets: TicketCategory[] = [
   {
-    type: "Attendees",
-    price: "₹599",
-    numericPrice: 599,
-    description: "Access for general public and all attendees.",
+    type: "Attendees & Faculty",
+    price: "₹500",
+    numericPrice: 500,
+    description: "Access for faculty, general public, and all attendees.",
     soldOut: false,
     disabled: false,
   },

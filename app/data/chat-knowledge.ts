@@ -105,7 +105,7 @@ export const knowledgeBase: KnowledgeEntry[] = [
     triggers: ["ticket", "price", "cost", "buy", "book", "register", "fee"],
     patterns: [/how much (is|are|does)/i, /ticket (price|cost|fee)/i, /buy.*ticket/i, /book.*(now|ticket)/i, /(student|attendee|faculty).*(price|cost)/i, /purchase/i, /registration/i],
     response:
-      "Here are the ticket prices (Total capacity is strictly limited to 100 seats):\n• **Impact College Students**: ₹499 (valid USN required)\n• **Attendees**: ₹599\n\nBook your tickets on the tickets page: /tickets",
+      "Here are the ticket prices (Total capacity is strictly limited to 100 seats):\n• **Impact College Students**: ₹499 (valid USN required)\n• **Attendees & Faculty**: ₹500\n\nBook your tickets on the tickets page: /tickets",
     priority: 5,
   },
   {
@@ -123,7 +123,7 @@ export const knowledgeBase: KnowledgeEntry[] = [
     triggers: ["attendees ticket", "faculty ticket", "professional", "general access"],
     patterns: [/attendee.*(ticket|price)/i, /faculty.*(ticket|price)/i, /professional.*ticket/i, /general.*access/i],
     response:
-      "Attendee tickets are **₹599**. Book here: /tickets",
+      "Attendee & Faculty tickets are **₹500**. Book here: /tickets",
     priority: 2,
   },
   {

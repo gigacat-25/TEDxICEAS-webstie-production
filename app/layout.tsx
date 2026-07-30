@@ -148,8 +148,8 @@ export default function RootLayout({
       },
       {
         "@type": "Offer",
-        name: "Attendee Pass",
-        price: "599",
+        name: "Attendees & Faculty Pass",
+        price: "500",
         priceCurrency: "INR",
         url: "https://tedxiceas.com/tickets",
         availability: "https://schema.org/InStock",
