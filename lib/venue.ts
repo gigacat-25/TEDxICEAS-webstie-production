@@ -143,6 +143,12 @@ export const event = {
       description: "CTO of Ventures and Studios at Nagarro, writer at HowToArchitect.io, systems architect & technology leader.",
       image: "https://tedxiceas.in/speakers/kapil-ahuja.jpg",
     },
+    {
+      name: "Dr. Paul Mathulla",
+      jobTitle: "Chairman of the Governing Council, Impact Group of Institutions | M.E., Ph.D.",
+      description: "Chairman of the Governing Council at Impact Group of Institutions, Bengaluru, overseeing academic and administrative growth.",
+      image: "https://tedxiceas.in/speakers/dr-paul-mathulla.jpg",
+    },
   ],
 };
 

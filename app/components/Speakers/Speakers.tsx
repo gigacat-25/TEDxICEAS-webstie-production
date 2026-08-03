@@ -80,6 +80,12 @@ const speakers: Speaker[] = [
     img: "/speakers/manish-kankaria.jpg",
   },
   {
+    name: "Dr. Paul Mathulla",
+    title: "Chairman of the Governing Council, Impact Group of Institutions | M.E., Ph.D.",
+    description: "Dr. Paul Mathulla (M.E., Ph.D.) serves as the Chairman of the Governing Council at Impact Group of Institutions, Bengaluru, where he oversees the academic and administrative growth of the organization. Rejecting narrow specialization, his educational philosophy focuses on delivering a flexible, interdisciplinary learning environment that equips students with versatile problem-solving skills, maintaining high academic standards closely aligned with technological advances and dynamic industry demands.",
+    img: "/speakers/dr-paul-mathulla.jpg",
+  },
+  {
     name: "Kapil Ahuja",
     title: "CTO of Ventures & Studios, Nagarro | Author & Architect",
     description: "CTO of Ventures and Studios at Nagarro and writer at HowToArchitect.io. Dedicated to architecting tech systems, leading high-performing teams, and exploring principles that shape human-centered innovation and leadership.",

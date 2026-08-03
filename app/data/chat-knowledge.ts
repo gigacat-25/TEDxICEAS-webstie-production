@@ -19,6 +19,7 @@ const speakersList = [
   { name: "Dr. Lokesh B", title: "Senior Consultant in Neurology, Aster CMI Hospital" },
   { name: "Manish Kankaria", title: "Founder, Bombay Kulfi | Entrepreneur & CA" },
   { name: "Kapil Ahuja", title: "CTO of Ventures & Studios, Nagarro | Author & Architect" },
+  { name: "Dr. Paul Mathulla", title: "Chairman of the Governing Council, Impact Group of Institutions | M.E., Ph.D." },
 ]
 
 const performersList = []
