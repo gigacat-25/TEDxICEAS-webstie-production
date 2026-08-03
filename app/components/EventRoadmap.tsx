@@ -282,7 +282,7 @@ export default function EventRoadmap() {
 
   const handleShare = (item: RoadmapItem, e: React.MouseEvent) => {
     e.stopPropagation();
-    const shareText = `TEDxICEAS 2026: ${item.title} at ${item.time}! Check the official event flow at https://tedxiceas.com/roadmap`;
+    const shareText = `TEDxICEAS 2026: ${item.title} at ${item.time}! Check the official event flow at https://tedxiceas.in/roadmap`;
     if (navigator.clipboard) {
       navigator.clipboard.writeText(shareText);
       setCopiedId(item.id);

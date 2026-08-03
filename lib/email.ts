@@ -281,7 +281,7 @@ export async function sendEventFlowEmail(toEmail: string, name: string) {
       </p>
       
       <p style="font-size: 16px; line-height: 1.6; color: #555555; margin-bottom: 12px;">
-        Below is the official schedule and event flow for today. You can also view the full interactive roadmap at <a href="https://tedxiceas.com/roadmap" style="color: #EB0028; font-weight: bold; text-decoration: underline;">tedxiceas.com/roadmap</a>.
+        Below is the official schedule and event flow for today. You can also view the full interactive roadmap at <a href="https://tedxiceas.in/roadmap" style="color: #EB0028; font-weight: bold; text-decoration: underline;">tedxiceas.in/roadmap</a>.
       </p>
       
       <div style="background-color: #f9f9f9; border-left: 4px solid #EB0028; padding: 15px; margin: 20px 0; border-radius: 4px;">
@@ -393,7 +393,7 @@ export async function sendEventFlowEmail(toEmail: string, name: string) {
           <li style="margin-bottom: 6px;"><strong>Staff Authority & Property Protection:</strong> Comply with all staff/volunteer instructions. College property must be protected; damage will lead to immediate eviction & financial liability.</li>
         </ol>
         <p style="margin: 10px 0 0 0; font-size: 12px; color: #78350f;">
-          For full legal details, visit <a href="https://tedxiceas.com/terms" style="color: #EB0028; font-weight: bold;">tedxiceas.com/terms</a>.
+          For full legal details, visit <a href="https://tedxiceas.in/terms" style="color: #EB0028; font-weight: bold;">tedxiceas.in/terms</a>.
         </p>
       </div>
       

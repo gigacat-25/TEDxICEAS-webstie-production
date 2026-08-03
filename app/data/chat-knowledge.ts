@@ -52,12 +52,42 @@ export const knowledgeBase: KnowledgeEntry[] = [
     priority: 3,
   },
   {
+    id: "event-roadmap",
+    category: "Event",
+    triggers: ["roadmap", "event flow", "agenda", "timeline", "schedule", "timings", "order of talks", "program", "flow"],
+    patterns: [/event (flow|roadmap|agenda|timeline|schedule|program)/i, /what time/i, /when does.*start/i, /talk timings/i, /schedule of talks/i, /roadmap/i, /flow/i],
+    response: `Here is the official **TEDxICEAS 2026 Event Flow & Roadmap** (9:30 AM – 4:20 PM):\n\n` +
+      `• **09:30 AM**: Welcome + Introduction\n` +
+      `• **09:35 AM**: Lighting the Lamp\n` +
+      `• **09:40 AM**: Introduction to TEDx\n` +
+      `• **09:58 AM**: Talk by Paul Mathulla\n` +
+      `• **10:16 AM**: Talk by Shwetha Vohra\n` +
+      `• **10:34 AM**: Talk by Dr. Lokesh\n` +
+      `• **10:52 AM**: Game: TEDx Bingo Cards\n` +
+      `• **11:02 AM**: Monster Energy Break ⚡\n` +
+      `• **11:12 AM**: Talk by Kapil Ahuja\n` +
+      `• **11:30 AM**: Talk by Dr. Ghazala Ahmed Shafi\n` +
+      `• **11:48 AM**: Talk by Sanjay R\n` +
+      `• **12:06 PM**: Dance Performance by Ankitha, Gowri, Anushka 💃\n` +
+      `• **12:14 PM**: Talk by Arun Prasanna\n` +
+      `• **12:32 PM**: Networking Lunch Break 🍽️\n` +
+      `• **02:00 PM**: Talk by Manish Kankaria\n` +
+      `• **02:18 PM**: Talk by Dr. Saheer Nelliparamban\n` +
+      `• **02:36 PM**: Talk by Neole Anna Cornelio\n` +
+      `• **02:54 PM**: Talk by Fazlur Rahman Khan\n` +
+      `• **03:12 PM**: Talk by Huda Thamanna\n` +
+      `• **03:30 PM**: Snack Break 🍿\n` +
+      `• **03:50 PM**: Music Performance by Karthik Boon 🎵\n\n` +
+      `Explore the full interactive roadmap at **/roadmap**!`,
+    priority: 6,
+  },
+  {
     id: "event-date",
     category: "Event",
-    triggers: ["date", "when", "august", "schedule", "day"],
-    patterns: [/when (is|will|does) (the |)event/i, /what date/i, /when.*happening/i, /event (date|day)/i, /schedule/i, /timing/i],
+    triggers: ["date", "when", "august", "day"],
+    patterns: [/when (is|will|does) (the |)event/i, /what date/i, /when.*happening/i, /event (date|day)/i],
     response:
-      "TEDxICEAS is scheduled for **August 10, 2026**, from 9:00 AM to 6:00 PM at Visvesvaraya Auditorium. Mark your calendar — it's going to be an unforgettable day of ideas and inspiration!",
+      "TEDxICEAS is scheduled for **August 10, 2026**, from 9:30 AM to 4:20 PM at Visvesvaraya Auditorium. Check out the complete event flow at **/roadmap**!",
     priority: 5,
   },
   {

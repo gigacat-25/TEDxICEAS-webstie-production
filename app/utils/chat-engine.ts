@@ -93,7 +93,7 @@ export function getResponse(input: string): string {
 
 export function getSuggestedQuestions(): string[] {
   return [
-    "When is the event?",
+    "What is the event roadmap?",
     "Who are the speakers?",
     "How much are tickets?",
     "Where is the venue?",
