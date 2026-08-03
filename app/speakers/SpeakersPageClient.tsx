@@ -111,6 +111,15 @@ export const speakersData: SpeakerDetail[] = [
     highlights: ["Founder Bombay Kulfi", "100+ Outlets & Global Brand", "Chartered Accountant & Entrepreneur"],
   },
   {
+    id: "dr-paul-mathulla",
+    name: "Dr. Paul Mathulla",
+    title: "Chairman of the Governing Council, Impact Group of Institutions | M.E., Ph.D.",
+    category: "Education & Leadership",
+    bio: "Dr. Paul Mathulla (M.E., Ph.D.) serves as the Chairman of the Governing Council at Impact Group of Institutions, Bengaluru, where he oversees the academic and administrative growth of the organization. Rejecting narrow specialization, his educational philosophy focuses on delivering a flexible, interdisciplinary learning environment that equips students with versatile problem-solving skills. Under his leadership, the institutions maintain high academic standards closely aligned with technological advances and the dynamic industry demands of Bengaluru.",
+    img: "/speakers/dr-paul-mathulla.jpg",
+    highlights: ["Chairman Governing Council", "Interdisciplinary Learning", "M.E., Ph.D."],
+  },
+  {
     id: "kapil-ahuja",
     name: "Kapil Ahuja",
     title: "CTO of Ventures & Studios, Nagarro | Author & Architect",
@@ -121,7 +130,7 @@ export const speakersData: SpeakerDetail[] = [
   },
 ];
 
-const categories = ["All", "Media & Content", "Business & Leadership", "Fintech & Healthcare", "Technology & Cloud", "Medicine & Healthcare", "Sports & Performance", "Community & Tech", "Engineering & Systems"];
+const categories = ["All", "Education & Leadership", "Media & Content", "Business & Leadership", "Fintech & Healthcare", "Technology & Cloud", "Medicine & Healthcare", "Sports & Performance", "Community & Tech", "Engineering & Systems"];
 
 export default function SpeakersPageClient() {
   const { theme } = useTheme();
