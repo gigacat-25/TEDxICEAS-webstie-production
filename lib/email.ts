@@ -272,7 +272,7 @@ export async function sendEventFlowEmail(toEmail: string, name: string) {
     <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #ffffff; color: #333333;">
       <div style="text-align: center; border-bottom: 2px solid #EB0028; padding-bottom: 20px; margin-bottom: 20px;">
         <h1 style="color: #000000; font-size: 28px; margin: 0; font-weight: bold; letter-spacing: -0.5px;">TEDx<span style="color: #EB0028;">ICEAS</span></h1>
-        <p style="color: #666666; font-size: 14px; margin: 5px 0 0 0; text-transform: uppercase; letter-spacing: 2px;">Ideas Worth Spreading</p>
+        <p style="color: #666666; font-size: 14px; margin: 5px 0 0 0; text-transform: uppercase; letter-spacing: 2px;">What Shapes Us</p>
       </div>
       
       <h2 style="color: #000000; font-size: 20px; margin-top: 0;">Welcome, ${name}!</h2>
@@ -280,51 +280,122 @@ export async function sendEventFlowEmail(toEmail: string, name: string) {
         We are thrilled to have you join us at <strong>TEDxICEAS</strong>! Your entry has been checked in and verified at the registration desk.
       </p>
       
-      <p style="font-size: 16px; line-height: 1.6; color: #555555; margin-bottom: 8px;">
-        Below is the official schedule and event flow for today. We hope you have an inspiring and thought-provoking experience!
+      <p style="font-size: 16px; line-height: 1.6; color: #555555; margin-bottom: 12px;">
+        Below is the official schedule and event flow for today. You can also view the full interactive roadmap at <a href="https://tedxiceas.com/roadmap" style="color: #EB0028; font-weight: bold; text-decoration: underline;">tedxiceas.com/roadmap</a>.
       </p>
       
       <div style="background-color: #f9f9f9; border-left: 4px solid #EB0028; padding: 15px; margin: 20px 0; border-radius: 4px;">
         <h3 style="margin-top: 0; color: #000000; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 12px;">Event Flow Schedule</h3>
-        <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.6;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px; line-height: 1.5;">
           <tr style="border-bottom: 1px solid #eee;">
-            <td style="padding: 8px 0; font-weight: bold; color: #EB0028; width: 180px;">09:00 AM - 09:30 AM</td>
-            <td style="padding: 8px 0; color: #333333;">Registration & Welcome Kit Distribution</td>
+            <td style="padding: 6px 0; font-weight: bold; color: #EB0028; width: 100px;">09:30 AM</td>
+            <td style="padding: 6px 0; color: #333333;">Welcome + Introduction</td>
           </tr>
           <tr style="border-bottom: 1px solid #eee;">
-            <td style="padding: 8px 0; font-weight: bold; color: #EB0028;">09:30 AM - 10:00 AM</td>
-            <td style="padding: 8px 0; color: #333333;">Opening Ceremony & Lamp Lighting</td>
+            <td style="padding: 6px 0; font-weight: bold; color: #EB0028;">09:35 AM</td>
+            <td style="padding: 6px 0; color: #333333;">Lighting the Lamp</td>
           </tr>
           <tr style="border-bottom: 1px solid #eee;">
-            <td style="padding: 8px 0; font-weight: bold; color: #EB0028;">10:00 AM - 11:30 AM</td>
-            <td style="padding: 8px 0; color: #333333;"><strong>Session 1: Unleashing Innovation</strong><br/><span style="color:#666; font-size:12px;">3 Talks & Interactive Q&A</span></td>
+            <td style="padding: 6px 0; font-weight: bold; color: #EB0028;">09:40 AM</td>
+            <td style="padding: 6px 0; color: #333333;">Introduction to TEDx</td>
           </tr>
           <tr style="border-bottom: 1px solid #eee;">
-            <td style="padding: 8px 0; font-weight: bold; color: #EB0028;">11:30 AM - 12:00 PM</td>
-            <td style="padding: 8px 0; color: #333333;">Networking Coffee Break ☕</td>
+            <td style="padding: 6px 0; font-weight: bold; color: #EB0028;">09:58 AM</td>
+            <td style="padding: 6px 0; color: #333333;">Talk by <strong>Paul Mathulla</strong></td>
           </tr>
           <tr style="border-bottom: 1px solid #eee;">
-            <td style="padding: 8px 0; font-weight: bold; color: #EB0028;">12:00 PM - 01:30 PM</td>
-            <td style="padding: 8px 0; color: #333333;"><strong>Session 2: Breaking Barriers</strong><br/><span style="color:#666; font-size:12px;">3 Talks & Panel Discussion</span></td>
+            <td style="padding: 6px 0; font-weight: bold; color: #EB0028;">10:16 AM</td>
+            <td style="padding: 6px 0; color: #333333;">Talk by <strong>Shwetha Vohra</strong></td>
           </tr>
           <tr style="border-bottom: 1px solid #eee;">
-            <td style="padding: 8px 0; font-weight: bold; color: #EB0028;">01:30 PM - 02:30 PM</td>
-            <td style="padding: 8px 0; color: #333333;">Networking Lunch Break 🍽️</td>
+            <td style="padding: 6px 0; font-weight: bold; color: #EB0028;">10:34 AM</td>
+            <td style="padding: 6px 0; color: #333333;">Talk by <strong>Dr. Lokesh</strong></td>
           </tr>
           <tr style="border-bottom: 1px solid #eee;">
-            <td style="padding: 8px 0; font-weight: bold; color: #EB0028;">02:30 PM - 04:00 PM</td>
-            <td style="padding: 8px 0; color: #333333;"><strong>Session 3: The Future Paradigm</strong><br/><span style="color:#666; font-size:12px;">3 Talks & Concluding Thoughts</span></td>
+            <td style="padding: 6px 0; font-weight: bold; color: #EB0028;">10:52 AM</td>
+            <td style="padding: 6px 0; color: #333333;">Game: TEDx Bingo Cards 🎮</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #eee; background-color: #f0fdf4;">
+            <td style="padding: 6px 8px; font-weight: bold; color: #50B848;">11:02 AM</td>
+            <td style="padding: 6px 8px; color: #15803d; font-weight: bold;">Monster Energy Break ⚡</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #eee;">
+            <td style="padding: 6px 0; font-weight: bold; color: #EB0028;">11:12 AM</td>
+            <td style="padding: 6px 0; color: #333333;">Talk by <strong>Kapil Ahuja</strong></td>
+          </tr>
+          <tr style="border-bottom: 1px solid #eee;">
+            <td style="padding: 6px 0; font-weight: bold; color: #EB0028;">11:30 AM</td>
+            <td style="padding: 6px 0; color: #333333;">Talk by <strong>Dr. Ghazala Ahmed Shafi</strong></td>
+          </tr>
+          <tr style="border-bottom: 1px solid #eee;">
+            <td style="padding: 6px 0; font-weight: bold; color: #EB0028;">11:48 AM</td>
+            <td style="padding: 6px 0; color: #333333;">Talk by <strong>Sanjay R</strong></td>
+          </tr>
+          <tr style="border-bottom: 1px solid #eee;">
+            <td style="padding: 6px 0; font-weight: bold; color: #EB0028;">12:06 PM</td>
+            <td style="padding: 6px 0; color: #333333;">Dance Performance by <strong>Ankitha, Gowri, Anushka</strong> 💃</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #eee;">
+            <td style="padding: 6px 0; font-weight: bold; color: #EB0028;">12:14 PM</td>
+            <td style="padding: 6px 0; color: #333333;">Talk by <strong>Arun Prasanna</strong></td>
+          </tr>
+          <tr style="border-bottom: 1px solid #eee; background-color: #fff1f2;">
+            <td style="padding: 6px 8px; font-weight: bold; color: #EB0028;">12:32 PM</td>
+            <td style="padding: 6px 8px; color: #9f1239; font-weight: bold;">Lunch Break 🍽️</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #eee;">
+            <td style="padding: 6px 0; font-weight: bold; color: #EB0028;">02:00 PM</td>
+            <td style="padding: 6px 0; color: #333333;">Talk by <strong>Manish Kankaria</strong></td>
+          </tr>
+          <tr style="border-bottom: 1px solid #eee;">
+            <td style="padding: 6px 0; font-weight: bold; color: #EB0028;">02:18 PM</td>
+            <td style="padding: 6px 0; color: #333333;">Talk by <strong>Dr. Saheer Nelliparamban</strong></td>
+          </tr>
+          <tr style="border-bottom: 1px solid #eee;">
+            <td style="padding: 6px 0; font-weight: bold; color: #EB0028;">02:36 PM</td>
+            <td style="padding: 6px 0; color: #333333;">Talk by <strong>Neole Anna Cornelio</strong></td>
+          </tr>
+          <tr style="border-bottom: 1px solid #eee;">
+            <td style="padding: 6px 0; font-weight: bold; color: #EB0028;">02:54 PM</td>
+            <td style="padding: 6px 0; color: #333333;">Talk by <strong>Fazlur Rahman Khan</strong></td>
+          </tr>
+          <tr style="border-bottom: 1px solid #eee;">
+            <td style="padding: 6px 0; font-weight: bold; color: #EB0028;">03:12 PM</td>
+            <td style="padding: 6px 0; color: #333333;">Talk by <strong>Huda Thamanna</strong></td>
+          </tr>
+          <tr style="border-bottom: 1px solid #eee; background-color: #fefce8;">
+            <td style="padding: 6px 8px; font-weight: bold; color: #d97706;">03:30 PM</td>
+            <td style="padding: 6px 8px; color: #92400e; font-weight: bold;">Snack Break 🍿</td>
           </tr>
           <tr>
-            <td style="padding: 8px 0; font-weight: bold; color: #EB0028;">04:00 PM - 04:30 PM</td>
-            <td style="padding: 8px 0; color: #333333;">Closing Ceremony & Valedictory</td>
+            <td style="padding: 6px 0; font-weight: bold; color: #EB0028;">03:50 PM</td>
+            <td style="padding: 6px 0; color: #333333;">Music Performance by <strong>Karthik Boon</strong> 🎵</td>
           </tr>
         </table>
       </div>
       
-      <p style="font-size: 16px; line-height: 1.6; color: #555555;">
+      <p style="font-size: 15px; line-height: 1.6; color: #555555;">
         Your ticket also contains a <strong>Food Pass</strong> and <strong>Goodie Pass</strong>. Please present your ticket QR code at the respective food and kit counters to claim them.
       </p>
+
+      <div style="background-color: #fffcf5; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; border-radius: 4px;">
+        <h3 style="margin-top: 0; color: #000000; font-size: 16px; border-bottom: 1px solid #fef3c7; padding-bottom: 8px; margin-bottom: 12px;">🏛️ Venue Rules, Safety & Attendee Code of Conduct</h3>
+        <ol style="margin: 0; padding-left: 18px; font-size: 13px; color: #4b5563; line-height: 1.6;">
+          <li style="margin-bottom: 6px;"><strong>Photography & Videography:</strong> The event is professionally recorded. By entering, attendees consent to their likeness being used in official TEDxICEAS media.</li>
+          <li style="margin-bottom: 6px;"><strong>Emergency & Safety:</strong> Follow staff/security instructions immediately in emergencies. Keep exits unobstructed.</li>
+          <li style="margin-bottom: 6px;"><strong>Restricted Items:</strong> Weapons, alcohol, smoking, fireworks, drones, laser pointers & hazardous materials are strictly prohibited.</li>
+          <li style="margin-bottom: 6px;"><strong>Food & Beverages:</strong> Outside food is restricted inside the main auditorium. Please use designated refreshment zones during breaks.</li>
+          <li style="margin-bottom: 6px;"><strong>Mobile Etiquette:</strong> Keep phones on silent during talks. Calls must be taken outside the auditorium.</li>
+          <li style="margin-bottom: 6px;"><strong>Respect for Speakers:</strong> Interruptions, shouting, or disruptive behavior during talks are strictly prohibited.</li>
+          <li style="margin-bottom: 6px;"><strong>Seating & Entry:</strong> Seating is first-come, first-served. Late arrivals will enter during appropriate session breaks.</li>
+          <li style="margin-bottom: 6px;"><strong>Lost & Found & Valuables:</strong> You are solely responsible for your personal belongings. Misplaced items can be reported at the Help Desk.</li>
+          <li style="margin-bottom: 6px;"><strong>Environmental Responsibility:</strong> Please keep the venue clean and dispose of waste in designated recycling bins.</li>
+          <li style="margin-bottom: 6px;"><strong>Staff Authority & Property Protection:</strong> Comply with all staff/volunteer instructions. College property must be protected; damage will lead to immediate eviction & financial liability.</li>
+        </ol>
+        <p style="margin: 10px 0 0 0; font-size: 12px; color: #78350f;">
+          For full legal details, visit <a href="https://tedxiceas.com/terms" style="color: #EB0028; font-weight: bold;">tedxiceas.com/terms</a>.
+        </p>
+      </div>
       
       <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #888888; font-size: 12px; line-height: 1.4;">
         <p style="margin: 0; font-weight: bold; color: #555555;">&copy; ${new Date().getFullYear()} TEDxICEAS. All rights reserved.</p>

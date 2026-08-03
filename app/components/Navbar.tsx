@@ -13,6 +13,7 @@ const navLinks = [
   { name: "MOSAIC", href: "/chat" },
   { name: "ABOUT", href: "/about" },
   { name: "SPEAKERS", href: "/speakers" },
+  { name: "ROADMAP", href: "/roadmap" },
   { name: "SPONSORS", href: "/sponsors" },
   { name: "JOURNEY", href: "/#journey" },
   { name: "TEAM", href: "/team" },
@@ -22,9 +23,10 @@ const mobileItems = [
   { id: "1", name: "MOSAIC", href: "/chat" },
   { id: "2", name: "ABOUT", href: "/about" },
   { id: "3", name: "SPEAKERS", href: "/speakers" },
-  { id: "4", name: "SPONSORS", href: "/sponsors" },
-  { id: "5", name: "JOURNEY", href: "/#journey" },
-  { id: "6", name: "TEAM", href: "/team" },
+  { id: "4", name: "ROADMAP", href: "/roadmap" },
+  { id: "5", name: "SPONSORS", href: "/sponsors" },
+  { id: "6", name: "JOURNEY", href: "/#journey" },
+  { id: "7", name: "TEAM", href: "/team" },
 ];
 
 const Navbar = ({ startAnimation = true }: { startAnimation?: boolean }) => {

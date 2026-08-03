@@ -12,8 +12,8 @@ import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import About from "./components/about";
 import EchoesHero from "./components/EchoesHero";
+import EventRoadmap from "./components/EventRoadmap";
 import Journey from "./components/journey";
-
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -22,6 +22,7 @@ export default function Home() {
   const heroRef = useRef<HTMLDivElement>(null);
   const aboutRef = useRef<HTMLDivElement>(null);
   const speakersRef = useRef<HTMLDivElement>(null);
+  const roadmapRef = useRef<HTMLDivElement>(null);
   const countdownRef = useRef<HTMLDivElement>(null);
   const echoesHeroRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
@@ -139,6 +140,10 @@ export default function Home() {
         className="panel min-h-[125vh] w-full relative bg-black snap-start"
       >
         <EchoesHero startAnimation={echoesHeroInView} />
+      </section>
+
+      <section id="roadmap" ref={roadmapRef} className="panel min-h-screen w-full relative bg-black snap-start">
+        <EventRoadmap />
       </section>
 
       <section id="journey" className="panel min-h-screen w-full relative bg-black snap-start">
