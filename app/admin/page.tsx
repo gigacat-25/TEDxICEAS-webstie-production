@@ -95,6 +95,13 @@ export default function AdminDashboard() {
   } | null>(null);
   const [emailAttachments, setEmailAttachments] = useState<Array<{ name: string; size: number; type: string; base64: string }>>([]);
   const [includeQRCode, setIncludeQRCode] = useState(true);
+  const [broadcastProgress, setBroadcastProgress] = useState<{
+    currentChunk: number;
+    totalChunks: number;
+    processedCount: number;
+    totalCount: number;
+    statusMessage: string;
+  } | null>(null);
 
   // Scanner States
   const [activeScanAction, setActiveScanAction] = useState<"check_in" | "food" | "goodie">("check_in");
@@ -291,6 +298,7 @@ export default function AdminDashboard() {
   const handleSendEmailBroadcast = async (isTestMode = false) => {
     setIsSendingEmail(true);
     setEmailSendResult(null);
+    setBroadcastProgress(null);
 
     const totalAttachmentBytes = emailAttachments.reduce((acc, curr) => acc + curr.size, 0);
     if (totalAttachmentBytes > 4.5 * 1024 * 1024) {
@@ -300,73 +308,182 @@ export default function AdminDashboard() {
     }
 
     const mode = isTestMode ? "test" : recipientMode;
-    const splitCustomEmails = customEmailsInput
-      .split(/[\n,\s]+/)
-      .map((e) => e.trim())
-      .filter(Boolean);
+
+    // Single test email mode
+    if (isTestMode) {
+      try {
+        const res = await fetch("/api/admin/tickets/send-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            subject: emailSubject,
+            title: emailTitle,
+            message: emailMessage,
+            ctaText: emailCtaText,
+            ctaUrl: emailCtaUrl,
+            recipientMode: "test",
+            testEmail: testEmailInput || user?.primaryEmailAddress?.emailAddress || "",
+            includeQRCode,
+            attachments: emailAttachments.map((att) => ({
+              filename: att.name,
+              content: att.base64,
+              contentType: att.type,
+            })),
+          }),
+        });
+
+        let data: any = {};
+        try {
+          data = await res.json();
+        } catch {
+          data = { success: false, error: `Server returned HTTP status ${res.status}.` };
+        }
+
+        if (res.ok && data.success) {
+          setEmailSendResult({
+            success: true,
+            message: data.message || "Test email sent successfully!",
+            totalCount: 1,
+            successCount: 1,
+            failureCount: 0,
+          });
+          setShowSendConfirmModal(false);
+        } else {
+          setEmailSendResult({
+            success: false,
+            message: data.error || "Failed to send test email.",
+          });
+        }
+      } catch (err: any) {
+        setEmailSendResult({
+          success: false,
+          message: err?.message || "Failed to send test email.",
+        });
+      } finally {
+        setIsSendingEmail(false);
+      }
+      return;
+    }
+
+    // BULK CHUNKED SENDER (5 emails per batch with 1.2s pause between batches)
+    let targetItems: string[] = [];
+
+    if (mode === "selected") {
+      targetItems = selectedTicketIds;
+    } else if (mode === "all") {
+      targetItems = tickets
+        .filter((t) => t.status === "approved")
+        .map((t) => t.id);
+    } else if (mode === "custom") {
+      targetItems = customEmailsInput
+        .split(/[\n,\s]+/)
+        .map((e) => e.trim())
+        .filter(Boolean);
+    }
+
+    if (targetItems.length === 0) {
+      setIsSendingEmail(false);
+      alert("No approved recipients found matching your selection criteria.");
+      return;
+    }
+
+    const BATCH_SIZE = 5;
+    const chunks: string[][] = [];
+    for (let i = 0; i < targetItems.length; i += BATCH_SIZE) {
+      chunks.push(targetItems.slice(i, i + BATCH_SIZE));
+    }
+
+    let overallSuccess = 0;
+    let overallFailure = 0;
+    const accumulatedErrors: any[] = [];
 
     try {
-      const res = await fetch("/api/admin/tickets/send-email", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      for (let cIdx = 0; cIdx < chunks.length; cIdx++) {
+        const currentChunk = chunks[cIdx];
+        const startNum = cIdx * BATCH_SIZE + 1;
+        const endNum = Math.min((cIdx + 1) * BATCH_SIZE, targetItems.length);
+
+        setBroadcastProgress({
+          currentChunk: cIdx + 1,
+          totalChunks: chunks.length,
+          processedCount: endNum,
+          totalCount: targetItems.length,
+          statusMessage: `Dispatching Batch ${cIdx + 1} of ${chunks.length} (${startNum} - ${endNum} of ${targetItems.length})...`,
+        });
+
+        const reqBody: any = {
           subject: emailSubject,
           title: emailTitle,
           message: emailMessage,
           ctaText: emailCtaText,
           ctaUrl: emailCtaUrl,
-          recipientMode: mode,
-          selectedTicketIds: mode === "selected" ? selectedTicketIds : [],
-          customEmails: mode === "custom" ? splitCustomEmails : [],
-          testEmail: isTestMode ? (testEmailInput || user?.primaryEmailAddress?.emailAddress) : "",
           includeQRCode,
           attachments: emailAttachments.map((att) => ({
             filename: att.name,
             content: att.base64,
             contentType: att.type,
           })),
-        }),
-      });
-
-      let data: any = {};
-      try {
-        data = await res.json();
-      } catch (parseErr) {
-        data = {
-          success: false,
-          error: res.status === 504
-            ? "Server Timeout (504): The broadcast request took too long to complete. Please try sending in smaller selected batches or reduce attachment file sizes."
-            : `Server returned HTTP status ${res.status}.`,
         };
+
+        if (mode === "custom") {
+          reqBody.recipientMode = "custom";
+          reqBody.customEmails = currentChunk;
+        } else {
+          reqBody.recipientMode = "selected";
+          reqBody.selectedTicketIds = currentChunk;
+        }
+
+        const res = await fetch("/api/admin/tickets/send-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(reqBody),
+        });
+
+        let data: any = {};
+        try {
+          data = await res.json();
+        } catch {
+          data = { success: false, failureCount: currentChunk.length };
+        }
+
+        if (res.ok && data.success) {
+          overallSuccess += data.successCount || 0;
+          overallFailure += data.failureCount || 0;
+          if (Array.isArray(data.errors)) {
+            accumulatedErrors.push(...data.errors);
+          }
+        } else {
+          overallFailure += currentChunk.length;
+          accumulatedErrors.push({
+            email: `Batch ${cIdx + 1}`,
+            error: data.error || "Batch send request failed.",
+          });
+        }
+
+        // Brief 1.2s delay between 5-email batches to respect SMTP connection rates
+        if (cIdx < chunks.length - 1) {
+          await new Promise((r) => setTimeout(r, 1200));
+        }
       }
 
-      if (res.ok && data.success) {
-        setEmailSendResult({
-          success: true,
-          message: data.message || `Successfully sent email broadcast!`,
-          totalCount: data.totalCount,
-          successCount: data.successCount,
-          failureCount: data.failureCount,
-          errors: data.errors,
-        });
-        setShowSendConfirmModal(false);
-      } else {
-        setEmailSendResult({
-          success: false,
-          message: data.error || "Failed to send email broadcast.",
-        });
-      }
+      setEmailSendResult({
+        success: overallSuccess > 0,
+        message: `Completed email broadcast to ${overallSuccess} of ${targetItems.length} recipient(s).`,
+        totalCount: targetItems.length,
+        successCount: overallSuccess,
+        failureCount: overallFailure,
+        errors: accumulatedErrors,
+      });
+      setShowSendConfirmModal(false);
     } catch (err: any) {
-      console.error("Broadcast email error:", err);
-      const isFetchError = err?.name === "TypeError" || err?.message?.includes("fetch");
+      console.error("Broadcast email batch error:", err);
       setEmailSendResult({
         success: false,
-        message: isFetchError
-          ? "Network/payload size limit error. If you attached large files, please compress or reduce attachment sizes (max 4.5MB combined total)."
-          : (err?.message || "An unexpected error occurred while sending email broadcast."),
+        message: err?.message || "An unexpected error occurred during batch email dispatch.",
       });
     } finally {
       setIsSendingEmail(false);
+      setBroadcastProgress(null);
     }
   };
 
@@ -2320,6 +2437,65 @@ export default function AdminDashboard() {
 
       {/* Email Delivery Result Modal */}
       <AnimatePresence>
+        {/* Live Batch Dispatch Progress Modal */}
+        {broadcastProgress && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md"
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 10 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 10 }}
+              className="relative w-full max-w-md bg-zinc-950 border border-[#EB0028]/40 rounded-2xl p-6 md:p-8 shadow-2xl space-y-6 text-center"
+            >
+              <div className="w-14 h-14 rounded-full bg-[#EB0028]/10 border border-[#EB0028]/40 flex items-center justify-center text-[#EB0028] mx-auto animate-pulse">
+                <Send size={26} />
+              </div>
+
+              <div className="space-y-1.5">
+                <span className="text-[10px] font-mono uppercase font-bold tracking-widest text-[#EB0028]">
+                  Automated Chunked Batch Dispatch
+                </span>
+                <h3 className="text-xl font-orbitron font-bold text-white">
+                  Broadcasting Emails...
+                </h3>
+                <p className="text-xs text-white/60 font-clash">
+                  {broadcastProgress.statusMessage}
+                </p>
+              </div>
+
+              {/* Progress Bar Component */}
+              <div className="space-y-2.5">
+                <div className="w-full bg-zinc-900 border border-white/10 rounded-full h-4 p-0.5 overflow-hidden shadow-inner">
+                  <div
+                    className="bg-[#EB0028] h-full rounded-full transition-all duration-300 shadow-md shadow-[#EB0028]/50"
+                    style={{
+                      width: `${Math.round(
+                        (broadcastProgress.processedCount / broadcastProgress.totalCount) * 100
+                      )}%`,
+                    }}
+                  ></div>
+                </div>
+
+                <div className="flex items-center justify-between text-[11px] font-mono text-zinc-400 px-1">
+                  <span>Batch {broadcastProgress.currentChunk} / {broadcastProgress.totalChunks}</span>
+                  <span className="text-[#EB0028] font-bold">
+                    {Math.round((broadcastProgress.processedCount / broadcastProgress.totalCount) * 100)}%
+                  </span>
+                  <span>{broadcastProgress.processedCount} of {broadcastProgress.totalCount} emails</span>
+                </div>
+              </div>
+
+              <div className="bg-zinc-900/80 border border-white/10 rounded-xl p-3 text-[11px] text-white/50 font-clash">
+                Sending 5 emails per batch with 1.2s pause to protect SMTP server connections. Please keep this browser window open.
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+
         {emailSendResult && (
           <motion.div
             initial={{ opacity: 0 }}

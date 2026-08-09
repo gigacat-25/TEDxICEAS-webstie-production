@@ -6,6 +6,21 @@ import { supabaseAdmin } from "@/lib/supabase";
 import { currentUser } from "@clerk/nextjs/server";
 import { sendCustomBroadcastEmail, getTransporter } from "@/lib/email";
 
+function withTimeout<T>(promise: Promise<T>, ms: number, errorMessage: string): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(errorMessage)), ms);
+    promise
+      .then((res) => {
+        clearTimeout(timer);
+        resolve(res);
+      })
+      .catch((err) => {
+        clearTimeout(timer);
+        reject(err);
+      });
+  });
+}
+
 async function isAuthorizedAdmin() {
   const user = await currentUser();
   if (!user) return null;
@@ -167,29 +182,29 @@ export async function POST(req: NextRequest) {
     let failureCount = 0;
     const errors: { email: string; error: string }[] = [];
 
-    // Create a single pooled SMTP transporter connection to share across all dispatches
-    const pooledTransporter = getTransporter();
-
-    // Process recipients in concurrent batches of 4 for maximum speed & SMTP safety
-    const BATCH_SIZE = 4;
+    // Process recipients in concurrent batches of 3 for maximum speed & SMTP safety
+    const BATCH_SIZE = 3;
     for (let i = 0; i < uniqueRecipients.length; i += BATCH_SIZE) {
       const batch = uniqueRecipients.slice(i, i + BATCH_SIZE);
       const results = await Promise.allSettled(
         batch.map((recipient) =>
-          sendCustomBroadcastEmail({
-            toEmail: recipient.email,
-            name: recipient.name,
-            ticketCode: recipient.ticketCode,
-            category: recipient.category,
-            subject: subject.trim(),
-            title: title ? title.trim() : subject.trim(),
-            message: message.trim(),
-            ctaText: ctaText ? ctaText.trim() : undefined,
-            ctaUrl: ctaUrl ? ctaUrl.trim() : undefined,
-            attachments,
-            includeQRCode,
-            transporter: pooledTransporter,
-          })
+          withTimeout(
+            sendCustomBroadcastEmail({
+              toEmail: recipient.email,
+              name: recipient.name,
+              ticketCode: recipient.ticketCode,
+              category: recipient.category,
+              subject: subject.trim(),
+              title: title ? title.trim() : subject.trim(),
+              message: message.trim(),
+              ctaText: ctaText ? ctaText.trim() : undefined,
+              ctaUrl: ctaUrl ? ctaUrl.trim() : undefined,
+              attachments,
+              includeQRCode,
+            }),
+            6000,
+            `Email to ${recipient.email} timed out (6s SMTP limit)`
+          )
         )
       );
 
@@ -209,16 +224,7 @@ export async function POST(req: NextRequest) {
 
       // Brief delay between batches to respect SMTP connection rates
       if (i + BATCH_SIZE < uniqueRecipients.length) {
-        await new Promise((resolve) => setTimeout(resolve, 150));
-      }
-    }
-
-    // Close the pooled transporter when batch dispatches complete
-    if (pooledTransporter && typeof (pooledTransporter as any).close === "function") {
-      try {
-        (pooledTransporter as any).close();
-      } catch (err) {
-        // Ignore close error
+        await new Promise((resolve) => setTimeout(resolve, 100));
       }
     }
 

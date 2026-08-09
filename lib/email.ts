@@ -16,9 +16,9 @@ export const getTransporter = () => {
     host: smtpHost,
     port: smtpPort,
     secure: smtpPort === 465, // true for 465, false for other ports
-    pool: true, // Use SMTP pooling for fast bulk email sending
-    maxConnections: 5,
-    maxMessages: 100,
+    connectionTimeout: 6000,  // 6s connection timeout
+    greetingTimeout: 4000,    // 4s greeting timeout
+    socketTimeout: 8000,       // 8s socket timeout
     auth: {
       user: smtpUser,
       pass: smtpPassword,
