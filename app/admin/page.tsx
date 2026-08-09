@@ -256,9 +256,16 @@ export default function AdminDashboard() {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
+    const currentTotalSize = emailAttachments.reduce((sum, item) => sum + item.size, 0);
+
     Array.from(files).forEach((file) => {
-      if (file.size > 10 * 1024 * 1024) {
-        alert(`File '${file.name}' exceeds the 10MB limit.`);
+      if (file.size > 3 * 1024 * 1024) {
+        alert(`File '${file.name}' exceeds the 3MB per-file size limit. Please attach a smaller file or compress it.`);
+        return;
+      }
+
+      if (currentTotalSize + file.size > 4.5 * 1024 * 1024) {
+        alert(`Total combined attachments size exceeds 4.5MB. Please remove some attachments before adding '${file.name}'.`);
         return;
       }
 
@@ -284,6 +291,13 @@ export default function AdminDashboard() {
   const handleSendEmailBroadcast = async (isTestMode = false) => {
     setIsSendingEmail(true);
     setEmailSendResult(null);
+
+    const totalAttachmentBytes = emailAttachments.reduce((acc, curr) => acc + curr.size, 0);
+    if (totalAttachmentBytes > 4.5 * 1024 * 1024) {
+      setIsSendingEmail(false);
+      alert("Total attached files size exceeds 4.5MB. Please reduce attachment sizes before sending.");
+      return;
+    }
 
     const mode = isTestMode ? "test" : recipientMode;
     const splitCustomEmails = customEmailsInput
@@ -334,9 +348,12 @@ export default function AdminDashboard() {
       }
     } catch (err: any) {
       console.error("Broadcast email error:", err);
+      const isFetchError = err?.name === "TypeError" || err?.message?.includes("fetch");
       setEmailSendResult({
         success: false,
-        message: "Network error occurred while sending email broadcast.",
+        message: isFetchError
+          ? "Network/payload size limit error. If you attached large files, please compress or reduce attachment sizes (max 4.5MB combined total)."
+          : (err?.message || "An unexpected error occurred while sending email broadcast."),
       });
     } finally {
       setIsSendingEmail(false);
