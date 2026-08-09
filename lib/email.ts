@@ -447,6 +447,7 @@ export async function sendCustomBroadcastEmail(options: {
     contentType?: string;
   }>;
   transporter?: any;
+  fetchInlineQR?: boolean;
 }) {
   const transporter = options.transporter || getTransporter();
   const shouldIncludeQR = options.includeQRCode !== false && Boolean(options.ticketCode);
@@ -454,7 +455,8 @@ export async function sendCustomBroadcastEmail(options: {
   let qrBuffer: Buffer | null = null;
   let qrSrc: string | undefined = undefined;
 
-  if (shouldIncludeQR && options.ticketCode) {
+  // Only attempt network buffer fetch if explicitly requested (e.g. single test email) to prevent bulk sending timeouts
+  if (shouldIncludeQR && options.ticketCode && options.fetchInlineQR) {
     qrBuffer = await fetchQRCodeBuffer(options.ticketCode);
     if (qrBuffer) {
       qrSrc = "cid:qrcode_image";

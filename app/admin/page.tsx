@@ -328,7 +328,17 @@ export default function AdminDashboard() {
         }),
       });
 
-      const data = await res.json();
+      let data: any = {};
+      try {
+        data = await res.json();
+      } catch (parseErr) {
+        data = {
+          success: false,
+          error: res.status === 504
+            ? "Server Timeout (504): The broadcast request took too long to complete. Please try sending in smaller selected batches or reduce attachment file sizes."
+            : `Server returned HTTP status ${res.status}.`,
+        };
+      }
 
       if (res.ok && data.success) {
         setEmailSendResult({
