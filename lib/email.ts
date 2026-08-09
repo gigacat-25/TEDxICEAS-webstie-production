@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { generateWebsiteThemedEmailHtml } from "./email-template";
 
 const smtpHost = process.env.SMTP_HOST || "";
 const smtpPort = parseInt(process.env.SMTP_PORT || "587", 10);
@@ -6,7 +7,7 @@ const smtpUser = process.env.SMTP_USER || "";
 const smtpPassword = process.env.SMTP_PASSWORD || "";
 const smtpFromEmail = process.env.SMTP_FROM_EMAIL || `"TEDxICEAS" <tedxiceas@gmail.com>`;
 
-const getTransporter = () => {
+export const getTransporter = () => {
   if (!smtpHost || !smtpUser || !smtpPassword) {
     console.warn("SMTP environment variables are missing. Email sending will be logged to console instead.");
     return null;
@@ -15,6 +16,9 @@ const getTransporter = () => {
     host: smtpHost,
     port: smtpPort,
     secure: smtpPort === 465, // true for 465, false for other ports
+    pool: true, // Use SMTP pooling for fast bulk email sending
+    maxConnections: 5,
+    maxMessages: 100,
     auth: {
       user: smtpUser,
       pass: smtpPassword,
@@ -94,16 +98,26 @@ export async function sendPendingConfirmationEmail(
   });
 }
 
-// Fetch QR code image from API as a buffer to send as inline email attachment (bypasses mobile Gmail client image blocking)
+// In-memory cache for QR code buffers to speed up bulk email dispatches
+const qrCodeCache = new Map<string, Buffer>();
+
+// Fetch QR code image from API as a buffer with fast timeout and caching
 async function fetchQRCodeBuffer(ticketCode: string): Promise<Buffer | null> {
+  if (!ticketCode) return null;
+  if (qrCodeCache.has(ticketCode)) {
+    return qrCodeCache.get(ticketCode)!;
+  }
+
   const url = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(ticketCode)}`;
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+    const res = await fetch(url, { signal: AbortSignal.timeout(2500) });
     if (!res.ok) return null;
     const arrayBuffer = await res.arrayBuffer();
-    return Buffer.from(arrayBuffer);
+    const buffer = Buffer.from(arrayBuffer);
+    qrCodeCache.set(ticketCode, buffer);
+    return buffer;
   } catch (err) {
-    console.error("Failed to fetch QR code buffer for inline email:", err);
+    console.warn(`Failed or timed out fetching QR code buffer for ticket ${ticketCode}, falling back to image URL.`);
     return null;
   }
 }
@@ -415,3 +429,77 @@ export async function sendEventFlowEmail(toEmail: string, name: string) {
     html: htmlContent,
   });
 }
+
+export async function sendCustomBroadcastEmail(options: {
+  toEmail: string;
+  name: string;
+  ticketCode?: string | null;
+  category?: string | null;
+  subject: string;
+  title: string;
+  message: string;
+  ctaText?: string;
+  ctaUrl?: string;
+  includeQRCode?: boolean;
+  attachments?: Array<{
+    filename: string;
+    content: string | Buffer;
+    contentType?: string;
+  }>;
+  transporter?: any;
+}) {
+  const transporter = options.transporter || getTransporter();
+  const shouldIncludeQR = options.includeQRCode !== false && Boolean(options.ticketCode);
+  
+  let qrBuffer: Buffer | null = null;
+  let qrSrc: string | undefined = undefined;
+
+  if (shouldIncludeQR && options.ticketCode) {
+    qrBuffer = await fetchQRCodeBuffer(options.ticketCode);
+    if (qrBuffer) {
+      qrSrc = "cid:qrcode_image";
+    }
+  }
+
+  const htmlContent = generateWebsiteThemedEmailHtml({
+    recipientName: options.name,
+    recipientEmail: options.toEmail,
+    ticketCode: options.ticketCode,
+    category: options.category,
+    subject: options.subject,
+    title: options.title,
+    message: options.message,
+    ctaText: options.ctaText,
+    ctaUrl: options.ctaUrl,
+    includeQRCode: shouldIncludeQR,
+    qrSrc,
+  });
+
+  if (!transporter) {
+    console.log(`[SMTP SIMULATION] Send broadcast email to ${options.toEmail}. Subject: ${options.subject}. QR: ${shouldIncludeQR}. Attachments: ${options.attachments?.length || 0}`);
+    return;
+  }
+
+  const formattedAttachments: any[] = options.attachments?.map((att) => ({
+    filename: att.filename,
+    content: typeof att.content === "string" ? Buffer.from(att.content, "base64") : att.content,
+    contentType: att.contentType,
+  })) || [];
+
+  if (qrBuffer) {
+    formattedAttachments.push({
+      filename: "qrcode.png",
+      content: qrBuffer,
+      cid: "qrcode_image",
+    });
+  }
+
+  await transporter.sendMail({
+    from: smtpFromEmail,
+    to: options.toEmail,
+    subject: options.subject,
+    html: htmlContent,
+    attachments: formattedAttachments,
+  });
+}
+

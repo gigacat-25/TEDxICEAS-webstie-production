@@ -20,7 +20,15 @@ import {
   Gift,
   ScanLine,
   Fingerprint,
-  Pencil
+  Pencil,
+  Mail,
+  Send,
+  Sparkles,
+  CheckSquare,
+  Square,
+  Paperclip,
+  Trash2,
+  File
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -59,7 +67,34 @@ export default function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
 
   // View Mode State
-  const [viewMode, setViewMode] = useState<"registrations" | "scanner" | "usns">("registrations");
+  const [viewMode, setViewMode] = useState<"registrations" | "scanner" | "usns" | "email">("registrations");
+
+  // Selected Ticket IDs for Emailing
+  const [selectedTicketIds, setSelectedTicketIds] = useState<string[]>([]);
+
+  // Email Broadcast Form States
+  const [emailSubject, setEmailSubject] = useState("Important Announcement | TEDxICEAS 🎤");
+  const [emailTitle, setEmailTitle] = useState("Official Event Update");
+  const [emailMessage, setEmailMessage] = useState(
+    "Hello {{name}},\n\nWe are thrilled to share an important update regarding TEDxICEAS!\n\nYour official entry ticket code is {{ticket_code}}. Please make sure to keep this email or a screenshot of your ticket code handy when arriving at the venue.\n\nWe look forward to welcoming you!"
+  );
+  const [emailCtaText, setEmailCtaText] = useState("View Event Roadmap");
+  const [emailCtaUrl, setEmailCtaUrl] = useState("https://tedxiceas.in/roadmap");
+  const [recipientMode, setRecipientMode] = useState<"all" | "selected" | "custom" | "test">("all");
+  const [customEmailsInput, setCustomEmailsInput] = useState("");
+  const [testEmailInput, setTestEmailInput] = useState("");
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [showSendConfirmModal, setShowSendConfirmModal] = useState(false);
+  const [emailSendResult, setEmailSendResult] = useState<{
+    success: boolean;
+    message: string;
+    totalCount?: number;
+    successCount?: number;
+    failureCount?: number;
+    errors?: any[];
+  } | null>(null);
+  const [emailAttachments, setEmailAttachments] = useState<Array<{ name: string; size: number; type: string; base64: string }>>([]);
+  const [includeQRCode, setIncludeQRCode] = useState(true);
 
   // Scanner States
   const [activeScanAction, setActiveScanAction] = useState<"check_in" | "food" | "goodie">("check_in");
@@ -196,6 +231,115 @@ export default function AdminDashboard() {
       alert("A network error occurred while uploading USNs.");
     } finally {
       setIsUploadingUsn(false);
+    }
+  };
+
+  // Approved tickets filter for email broadcast targeting
+  const approvedTickets = tickets.filter((t) => t.status === "approved");
+
+  const toggleSelectAllApproved = () => {
+    const approvedIds = approvedTickets.map((t) => t.id);
+    if (selectedTicketIds.length === approvedIds.length && approvedIds.length > 0) {
+      setSelectedTicketIds([]);
+    } else {
+      setSelectedTicketIds(approvedIds);
+    }
+  };
+
+  const toggleSelectTicket = (id: string) => {
+    setSelectedTicketIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleFileAttachment = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    Array.from(files).forEach((file) => {
+      if (file.size > 10 * 1024 * 1024) {
+        alert(`File '${file.name}' exceeds the 10MB limit.`);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        const base64 = result.split(",")[1];
+        setEmailAttachments((prev) => [
+          ...prev,
+          { name: file.name, size: file.size, type: file.type, base64 },
+        ]);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    e.target.value = "";
+  };
+
+  const removeAttachment = (index: number) => {
+    setEmailAttachments((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSendEmailBroadcast = async (isTestMode = false) => {
+    setIsSendingEmail(true);
+    setEmailSendResult(null);
+
+    const mode = isTestMode ? "test" : recipientMode;
+    const splitCustomEmails = customEmailsInput
+      .split(/[\n,\s]+/)
+      .map((e) => e.trim())
+      .filter(Boolean);
+
+    try {
+      const res = await fetch("/api/admin/tickets/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subject: emailSubject,
+          title: emailTitle,
+          message: emailMessage,
+          ctaText: emailCtaText,
+          ctaUrl: emailCtaUrl,
+          recipientMode: mode,
+          selectedTicketIds: mode === "selected" ? selectedTicketIds : [],
+          customEmails: mode === "custom" ? splitCustomEmails : [],
+          testEmail: isTestMode ? (testEmailInput || user?.primaryEmailAddress?.emailAddress) : "",
+          includeQRCode,
+          attachments: emailAttachments.map((att) => ({
+            filename: att.name,
+            content: att.base64,
+            contentType: att.type,
+          })),
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setEmailSendResult({
+          success: true,
+          message: data.message || `Successfully sent email broadcast!`,
+          totalCount: data.totalCount,
+          successCount: data.successCount,
+          failureCount: data.failureCount,
+          errors: data.errors,
+        });
+        setShowSendConfirmModal(false);
+      } else {
+        setEmailSendResult({
+          success: false,
+          message: data.error || "Failed to send email broadcast.",
+        });
+      }
+    } catch (err: any) {
+      console.error("Broadcast email error:", err);
+      setEmailSendResult({
+        success: false,
+        message: "Network error occurred while sending email broadcast.",
+      });
+    } finally {
+      setIsSendingEmail(false);
     }
   };
 
@@ -598,6 +742,20 @@ export default function AdminDashboard() {
               }`}
             >
               USNs
+            </button>
+            <button
+              onClick={() => {
+                setViewMode("email");
+                setScanResult(null);
+              }}
+              className={`px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 ${
+                viewMode === "email"
+                  ? "bg-[#EB0028] text-white"
+                  : "text-white/60 hover:text-white hover:bg-white/5"
+              }`}
+            >
+              <Mail size={12} />
+              <span>Send Emails</span>
             </button>
           </div>
 
@@ -1068,26 +1226,478 @@ export default function AdminDashboard() {
               </div>
             </div>
           </section>
+        ) : viewMode === "email" ? (
+          <section className="bg-zinc-950/60 border border-white/10 rounded-2xl p-6 md:p-8 backdrop-blur-md shadow-2xl space-y-8 relative">
+            <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-[#EB0028]"></div>
+            <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-[#EB0028]"></div>
+
+            {/* Section Header */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded-md bg-[#EB0028]/10 border border-[#EB0028]/30 text-[#EB0028] text-xs font-mono font-bold uppercase tracking-wider">
+                    Approved Ticket Holders Only
+                  </span>
+                  <span className="text-xs text-white/40 font-mono">
+                    {approvedTickets.length} Approved Attendees
+                  </span>
+                </div>
+                <h2 className="text-2xl font-orbitron font-bold text-white mt-2 flex items-center gap-2">
+                  <Mail className="text-[#EB0028]" size={24} />
+                  <span>Email Broadcast Studio</span>
+                </h2>
+                <p className="text-xs text-white/50 font-clash mt-1">
+                  Compose and dispatch official announcements styled with the website's dark TEDx red/black visual theme.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleSendEmailBroadcast(true)}
+                  disabled={isSendingEmail}
+                  className="px-4 py-2.5 bg-zinc-900 border border-white/15 hover:border-white/40 hover:bg-white/5 rounded-xl text-xs font-semibold uppercase tracking-wider text-white transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                  title="Send preview email to your admin address"
+                >
+                  {isSendingEmail ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} className="text-amber-400" />}
+                  <span>Send Test Email</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setShowSendConfirmModal(true)}
+                  disabled={isSendingEmail || (!emailSubject.trim() || !emailMessage.trim())}
+                  className="px-5 py-2.5 bg-[#EB0028] hover:bg-[#c30020] rounded-xl text-xs font-bold uppercase tracking-wider text-white transition-all flex items-center gap-2 shadow-lg shadow-[#EB0028]/20 cursor-pointer disabled:opacity-50"
+                >
+                  <Send size={14} />
+                  <span>Broadcast Email</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Main Content Grid: Form (Left) vs Live Theme Preview (Right) */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              
+              {/* Left Column: Email Configuration Form */}
+              <div className="lg:col-span-6 space-y-6">
+                
+                {/* Recipient Selection */}
+                <div className="space-y-3 bg-zinc-900/60 border border-white/10 p-5 rounded-xl">
+                  <label className="block text-xs font-bold uppercase tracking-wider font-orbitron text-white/70">
+                    Target Recipients (Approved Tickets Only)
+                  </label>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setRecipientMode("all")}
+                      className={`p-3 rounded-lg border text-left text-xs transition-all cursor-pointer ${
+                        recipientMode === "all"
+                          ? "bg-[#EB0028]/15 border-[#EB0028] text-white font-bold"
+                          : "bg-black/40 border-white/10 text-white/60 hover:text-white"
+                      }`}
+                    >
+                      <div className="font-bold">All Approved ({approvedTickets.length})</div>
+                      <div className="text-[10px] text-white/40 mt-0.5">Send to every confirmed registrant</div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setRecipientMode("selected")}
+                      className={`p-3 rounded-lg border text-left text-xs transition-all cursor-pointer ${
+                        recipientMode === "selected"
+                          ? "bg-[#EB0028]/15 border-[#EB0028] text-white font-bold"
+                          : "bg-black/40 border-white/10 text-white/60 hover:text-white"
+                      }`}
+                    >
+                      <div className="font-bold">Selected Rows ({selectedTicketIds.length})</div>
+                      <div className="text-[10px] text-white/40 mt-0.5">Checked rows in table</div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setRecipientMode("custom")}
+                      className={`p-3 rounded-lg border text-left text-xs transition-all cursor-pointer ${
+                        recipientMode === "custom"
+                          ? "bg-[#EB0028]/15 border-[#EB0028] text-white font-bold"
+                          : "bg-black/40 border-white/10 text-white/60 hover:text-white"
+                      }`}
+                    >
+                      <div className="font-bold">Custom Emails</div>
+                      <div className="text-[10px] text-white/40 mt-0.5">Specify custom email addresses</div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setRecipientMode("test")}
+                      className={`p-3 rounded-lg border text-left text-xs transition-all cursor-pointer ${
+                        recipientMode === "test"
+                          ? "bg-[#EB0028]/15 border-[#EB0028] text-white font-bold"
+                          : "bg-black/40 border-white/10 text-white/60 hover:text-white"
+                      }`}
+                    >
+                      <div className="font-bold">Test Mode</div>
+                      <div className="text-[10px] text-white/40 mt-0.5">Single preview test email</div>
+                    </button>
+                  </div>
+
+                  {/* Conditional Recipient Inputs */}
+                  {recipientMode === "custom" && (
+                    <div className="mt-3">
+                      <label className="block text-[11px] text-white/60 mb-1 font-mono">
+                        Enter approved recipient email addresses (comma or newline separated):
+                      </label>
+                      <textarea
+                        rows={3}
+                        value={customEmailsInput}
+                        onChange={(e) => setCustomEmailsInput(e.target.value)}
+                        placeholder="attendee1@example.com, attendee2@example.com..."
+                        className="w-full bg-black border border-white/15 rounded-lg p-3 text-xs text-white font-mono placeholder-white/20 focus:outline-none focus:border-[#EB0028]"
+                      />
+                    </div>
+                  )}
+
+                  {recipientMode === "test" && (
+                    <div className="mt-3">
+                      <label className="block text-[11px] text-white/60 mb-1 font-mono">
+                        Target Test Email Address:
+                      </label>
+                      <input
+                        type="email"
+                        value={testEmailInput}
+                        onChange={(e) => setTestEmailInput(e.target.value)}
+                        placeholder={user?.primaryEmailAddress?.emailAddress || "admin@example.com"}
+                        className="w-full bg-black border border-white/15 rounded-lg p-3 text-xs text-white font-mono placeholder-white/20 focus:outline-none focus:border-[#EB0028]"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Email Content Inputs */}
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider font-orbitron text-white/70 mb-1.5">
+                      Subject Line *
+                    </label>
+                    <input
+                      type="text"
+                      value={emailSubject}
+                      onChange={(e) => setEmailSubject(e.target.value)}
+                      placeholder="Important Announcement | TEDxICEAS 🎤"
+                      className="w-full bg-zinc-900 border border-white/15 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#EB0028]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider font-orbitron text-white/70 mb-1.5">
+                      Banner Header Title
+                    </label>
+                    <input
+                      type="text"
+                      value={emailTitle}
+                      onChange={(e) => setEmailTitle(e.target.value)}
+                      placeholder="Official Event Update"
+                      className="w-full bg-zinc-900 border border-white/15 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#EB0028]"
+                    />
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs font-bold uppercase tracking-wider font-orbitron text-white/70">
+                        Message Content *
+                      </label>
+                      <div className="flex gap-1 items-center">
+                        <span className="text-[10px] text-white/40 mr-1">Insert placeholder:</span>
+                        {["{{name}}", "{{ticket_code}}", "{{category}}"].map((tag) => (
+                          <button
+                            key={tag}
+                            type="button"
+                            onClick={() => setEmailMessage((prev) => prev + " " + tag)}
+                            className="px-1.5 py-0.5 bg-white/5 hover:bg-white/15 rounded border border-white/10 text-[10px] font-mono text-amber-400 cursor-pointer"
+                          >
+                            {tag}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <textarea
+                      rows={7}
+                      value={emailMessage}
+                      onChange={(e) => setEmailMessage(e.target.value)}
+                      className="w-full bg-zinc-900 border border-white/15 rounded-lg p-3.5 text-sm text-white focus:outline-none focus:border-[#EB0028] font-sans leading-relaxed"
+                    />
+                    <p className="text-[10px] text-white/40 mt-1">
+                      Separate paragraphs with double line breaks. Personalized fields will auto-populate for each attendee.
+                    </p>
+                  </div>
+
+                  {/* Call to Action Inputs */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-zinc-900/40 p-4 rounded-xl border border-white/5">
+                    <div>
+                      <label className="block text-[11px] font-bold uppercase tracking-wider font-orbitron text-white/60 mb-1">
+                        Button Text (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={emailCtaText}
+                        onChange={(e) => setEmailCtaText(e.target.value)}
+                        placeholder="View Event Roadmap"
+                        className="w-full bg-black border border-white/15 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#EB0028]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-bold uppercase tracking-wider font-orbitron text-white/60 mb-1">
+                        Button Target URL (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={emailCtaUrl}
+                        onChange={(e) => setEmailCtaUrl(e.target.value)}
+                        placeholder="https://tedxiceas.in/roadmap"
+                        className="w-full bg-black border border-white/15 rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-[#EB0028]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* QR Code Embed Toggle */}
+                  <div className="bg-zinc-900/60 p-4 rounded-xl border border-white/10 flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <label className="text-xs font-bold uppercase tracking-wider font-orbitron text-white/90 flex items-center gap-1.5 cursor-pointer">
+                        <QrCode size={16} className="text-[#EB0028]" />
+                        <span>Include Attendee QR Code & Entry Badge</span>
+                      </label>
+                      <p className="text-[11px] text-white/40 font-clash">
+                        Embeds recipient's unique entry QR code image & ticket code for venue check-in.
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setIncludeQRCode((prev) => !prev)}
+                      className={`w-12 h-6 rounded-full p-1 transition-colors cursor-pointer flex items-center shrink-0 ${
+                        includeQRCode ? "bg-[#EB0028] justify-end" : "bg-zinc-800 justify-start"
+                      }`}
+                    >
+                      <span className="w-4 h-4 rounded-full bg-white shadow-md block"></span>
+                    </button>
+                  </div>
+
+                  {/* File Attachments Upload Box */}
+                  <div className="bg-zinc-900/60 p-4 rounded-xl border border-white/10 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-bold uppercase tracking-wider font-orbitron text-white/70 flex items-center gap-1.5">
+                        <Paperclip size={14} className="text-[#EB0028]" />
+                        <span>Email Attachments ({emailAttachments.length})</span>
+                      </label>
+
+                      <label className="px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/15 rounded-lg text-xs font-semibold uppercase tracking-wider text-white transition-all cursor-pointer inline-flex items-center gap-1.5">
+                        <Paperclip size={12} />
+                        <span>Add Files</span>
+                        <input
+                          type="file"
+                          multiple
+                          onChange={handleFileAttachment}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+
+                    {emailAttachments.length === 0 ? (
+                      <p className="text-[11px] text-white/40 italic">
+                        No files attached. You can attach PDFs, images, or documents (max 10MB per file).
+                      </p>
+                    ) : (
+                      <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
+                        {emailAttachments.map((file, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-center justify-between p-2.5 bg-black/60 border border-white/10 rounded-lg text-xs"
+                          >
+                            <div className="flex items-center gap-2 truncate">
+                              <File size={14} className="text-amber-400 shrink-0" />
+                              <span className="font-mono text-white truncate">{file.name}</span>
+                              <span className="text-[10px] text-white/40 font-mono">
+                                ({(file.size / 1024).toFixed(0)} KB)
+                              </span>
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => removeAttachment(idx)}
+                              className="text-red-400 hover:text-red-300 p-1 hover:bg-white/5 rounded transition-colors cursor-pointer"
+                              title="Remove attachment"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Right Column: Live Website-Themed Email Preview */}
+              <div className="lg:col-span-6 space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold uppercase tracking-wider font-orbitron text-white/70 flex items-center gap-1.5">
+                    <Eye size={14} className="text-[#EB0028]" />
+                    <span>Live Theme Visual Preview</span>
+                  </label>
+                  <span className="text-[10px] text-white/40 font-mono">Theme: Dark Obsidian & TED Red</span>
+                </div>
+
+                {/* Live Email HTML Container */}
+                <div className="bg-[#0a0a0a] border border-white/15 rounded-2xl p-4 md:p-6 shadow-2xl overflow-hidden text-left">
+                  
+                  <div className="max-w-[500px] mx-auto bg-[#121212] border border-[#262626] rounded-xl overflow-hidden shadow-2xl">
+                    {/* Header */}
+                    <div className="bg-black p-6 text-center border-b-2 border-[#EB0028]">
+                      <h1 className="text-2xl font-black tracking-tight text-white m-0">
+                        TED<span className="text-[#EB0028]">x</span><span className="font-light text-white">ICEAS</span>
+                      </h1>
+                      <p className="text-[9px] uppercase tracking-widest text-zinc-400 mt-1 font-semibold">
+                        x = independently organized TED event
+                      </p>
+                    </div>
+
+                    {/* Banner Title */}
+                    {emailTitle && (
+                      <div className="bg-[#171717] px-6 py-4 border-b border-[#262626] text-center">
+                        <h2 className="text-base font-bold text-white m-0">{emailTitle}</h2>
+                      </div>
+                    )}
+
+                    {/* Message Body */}
+                    <div className="p-6 space-y-4 text-sm text-zinc-300">
+                      <p className="font-semibold text-white">Hello Alex (Sample Recipient),</p>
+                      
+                      {emailMessage.split(/\n\s*\n/).filter(Boolean).map((p, idx) => (
+                        <p key={idx} className="leading-relaxed text-zinc-300 whitespace-pre-wrap">
+                          {p.replace(/\{\{\s*name\s*\}\}/gi, "Alex")
+                            .replace(/\{\{\s*ticket_code\s*\}\}/gi, "TEDX-8821-SAMPLE")
+                            .replace(/\{\{\s*category\s*\}\}/gi, "Student")}
+                        </p>
+                      ))}
+
+                      {/* Sample QR Code Entry Card */}
+                      {includeQRCode && (
+                        <div className="text-center my-6">
+                          <div className="inline-block bg-[#171717] border-2 border-dashed border-[#EB0028] p-5 rounded-xl shadow-lg">
+                            <p className="text-[10px] uppercase font-bold text-zinc-400 m-0 mb-2 tracking-widest">
+                              Your Ticket Entry QR Code
+                            </p>
+                            <img
+                              src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=TEDX-8821-SAMPLE"
+                              alt="Ticket Entry QR Code"
+                              className="w-36 h-36 mx-auto border-4 border-white rounded-lg block shadow-md"
+                            />
+                            <p className="text-[9px] uppercase text-zinc-500 mt-2 mb-0 tracking-wider">
+                              Ticket Code
+                            </p>
+                            <h3 className="text-lg font-mono font-bold text-[#EB0028] m-0 tracking-wider">
+                              TEDX-8821-SAMPLE
+                            </h3>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Sample Ticket Badge */}
+                      <div className="bg-[#171717] border border-[#262626] border-l-4 border-l-[#EB0028] rounded-lg p-4 my-4">
+                        <div className="grid grid-cols-2 gap-1 text-xs">
+                          <span className="text-zinc-400">Attendee:</span>
+                          <span className="text-white font-semibold">Alex</span>
+                          <span className="text-zinc-400">Category:</span>
+                          <span className="text-white font-semibold">Student</span>
+                          <span className="text-zinc-400">Ticket Code:</span>
+                          <span className="text-[#EB0028] font-mono font-bold">TEDX-8821-SAMPLE</span>
+                        </div>
+                      </div>
+
+                      {/* Sample CTA Button */}
+                      {emailCtaText && emailCtaUrl && (
+                        <div className="text-center my-6">
+                          <span className="inline-block bg-[#EB0028] text-white font-bold text-xs uppercase px-6 py-3 rounded-md tracking-wider shadow-lg shadow-[#EB0028]/30">
+                            {emailCtaText}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Sample Attachments Badge */}
+                      {emailAttachments.length > 0 && (
+                        <div className="mt-4 p-3 bg-[#171717] border border-[#262626] rounded-lg text-xs space-y-1.5">
+                          <div className="font-bold text-zinc-300 flex items-center gap-1.5">
+                            <Paperclip size={12} className="text-[#EB0028]" />
+                            <span>Attachments ({emailAttachments.length} file{emailAttachments.length > 1 ? "s" : ""})</span>
+                          </div>
+                          <div className="space-y-1 pl-1">
+                            {emailAttachments.map((att, idx) => (
+                              <div key={idx} className="flex items-center gap-1.5 font-mono text-[11px] text-zinc-400">
+                                <File size={11} className="text-amber-400" />
+                                <span className="truncate">{att.name}</span>
+                                <span className="text-[10px] text-zinc-500">({(att.size / 1024).toFixed(0)} KB)</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="pt-4 border-t border-[#262626] text-xs text-zinc-400">
+                        Best regards,<br/>
+                        <strong className="text-white">The TEDxICEAS Team</strong>
+                      </div>
+                    </div>
+
+                    {/* Footer */}
+                    <div className="bg-[#09090b] p-4 text-center border-t border-[#1f1f23] text-[10px] text-zinc-500">
+                      <p className="m-0">Official announcement from TEDxICEAS</p>
+                      <p className="m-0 text-zinc-600 font-mono mt-1">&copy; 2026 TEDxICEAS. All rights reserved.</p>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+          </section>
         ) : (
           <section className="bg-zinc-950/40 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-md shadow-2xl flex flex-col min-h-[500px]">
             {/* Controls Bar */}
             <div className="p-5 border-b border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-zinc-950/20">
               {/* Tabs */}
-              <div className="flex gap-1.5 p-1 bg-zinc-900 border border-white/5 rounded-lg w-fit">
-                {["pending", "approved", "rejected", "all"].map((tab) => (
+              <div className="flex items-center gap-3">
+                <div className="flex gap-1.5 p-1 bg-zinc-900 border border-white/5 rounded-lg w-fit">
+                  {["pending", "approved", "rejected", "all"].map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setActiveTab(tab as any)}
+                      className={`px-4 py-1.5 rounded-md text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer
+                        ${activeTab === tab 
+                          ? "bg-[#EB0028] text-white shadow-md" 
+                          : "text-white/50 hover:text-white hover:bg-white/5"
+                        }
+                      `}
+                    >
+                      {tab}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Email Selected Tickets Quick Action */}
+                {selectedTicketIds.length > 0 && (
                   <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab as any)}
-                    className={`px-4 py-1.5 rounded-md text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer
-                      ${activeTab === tab 
-                        ? "bg-[#EB0028] text-white shadow-md" 
-                        : "text-white/50 hover:text-white hover:bg-white/5"
-                      }
-                    `}
+                    onClick={() => {
+                      setRecipientMode("selected");
+                      setViewMode("email");
+                    }}
+                    className="inline-flex items-center gap-2 bg-[#EB0028] hover:bg-[#c30020] text-white px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer shadow-md"
                   >
-                    {tab}
+                    <Mail size={13} />
+                    <span>Email ({selectedTicketIds.length}) Selected</span>
                   </button>
-                ))}
+                )}
               </div>
 
               {/* Search and Export */}
@@ -1130,6 +1740,20 @@ export default function AdminDashboard() {
                 <table className="w-full text-left font-clash text-sm border-collapse">
                   <thead>
                     <tr className="border-b border-white/10 bg-zinc-950/40 text-xs font-bold uppercase tracking-wider text-white/50 select-none">
+                      <th className="py-4 px-4 w-10 text-center">
+                        <button
+                          type="button"
+                          onClick={toggleSelectAllApproved}
+                          title="Select/Deselect all approved tickets"
+                          className="text-white/50 hover:text-white transition-colors cursor-pointer"
+                        >
+                          {selectedTicketIds.length > 0 && selectedTicketIds.length === approvedTickets.length ? (
+                            <CheckSquare size={16} className="text-[#EB0028]" />
+                          ) : (
+                            <Square size={16} />
+                          )}
+                        </button>
+                      </th>
                       <th className="py-4 px-6">Date</th>
                       <th className="py-4 px-6">Attendee</th>
                       <th className="py-4 px-6">Category</th>
@@ -1144,6 +1768,23 @@ export default function AdminDashboard() {
                   <tbody className="divide-y divide-white/5">
                     {filteredTickets.map((ticket) => (
                       <tr key={ticket.id} className="hover:bg-white/[0.02] transition-colors">
+                        <td className="py-4 px-4 text-center">
+                          {ticket.status === "approved" ? (
+                            <button
+                              type="button"
+                              onClick={() => toggleSelectTicket(ticket.id)}
+                              className="text-white/50 hover:text-white transition-colors cursor-pointer"
+                            >
+                              {selectedTicketIds.includes(ticket.id) ? (
+                                <CheckSquare size={16} className="text-[#EB0028]" />
+                              ) : (
+                                <Square size={16} />
+                              )}
+                            </button>
+                          ) : (
+                            <span className="text-white/10">—</span>
+                          )}
+                        </td>
                         <td className="py-4 px-6 text-white/60 text-xs">
                           <span className="block font-semibold">
                             {new Date(ticket.created_at).toLocaleDateString([], { month: 'short', day: 'numeric' })}
@@ -1539,6 +2180,177 @@ export default function AdminDashboard() {
                   )}
                 </button>
               </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Broadcast Email Confirmation Modal */}
+      <AnimatePresence>
+        {showSendConfirmModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md overflow-y-auto"
+            onClick={() => {
+              if (!isSendingEmail) setShowSendConfirmModal(false);
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 10 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 10 }}
+              className="relative w-full max-w-lg bg-zinc-950 border border-white/10 rounded-2xl p-6 md:p-8 shadow-2xl space-y-6 my-8"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setShowSendConfirmModal(false)}
+                disabled={isSendingEmail}
+                className="absolute top-6 right-6 text-white/50 hover:text-white hover:bg-white/10 p-2 rounded-full transition-colors cursor-pointer"
+              >
+                <X size={20} />
+              </button>
+
+              <div className="border-b border-white/10 pb-4">
+                <span className="text-xs uppercase font-bold tracking-widest text-[#EB0028] font-orbitron">
+                  Confirm Broadcast Dispatch
+                </span>
+                <h3 className="text-xl font-orbitron font-bold text-white mt-1 flex items-center gap-2">
+                  <Mail className="text-[#EB0028]" size={20} />
+                  <span>Send Email Broadcast?</span>
+                </h3>
+                <p className="text-xs text-white/50 font-clash mt-1">
+                  Please review recipient targeting and email details before triggering the broadcast.
+                </p>
+              </div>
+
+              <div className="space-y-3 bg-zinc-900/60 border border-white/5 p-4 rounded-xl text-xs font-clash">
+                <div className="flex justify-between">
+                  <span className="text-white/50">Target Mode:</span>
+                  <span className="font-bold text-white uppercase font-mono">{recipientMode}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/50">Recipients Count:</span>
+                  <span className="font-bold text-emerald-400 font-mono">
+                    {recipientMode === "all"
+                      ? `${approvedTickets.length} Approved Attendees`
+                      : recipientMode === "selected"
+                      ? `${selectedTicketIds.length} Selected Attendees`
+                      : recipientMode === "custom"
+                      ? `${customEmailsInput.split(/[\n,\s]+/).filter(Boolean).length} Custom Addresses`
+                      : "1 Test Address"}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/50">Subject Line:</span>
+                  <span className="font-semibold text-white truncate max-w-[240px]">{emailSubject}</span>
+                </div>
+                {emailAttachments.length > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-white/50">Attachments:</span>
+                    <span className="font-bold text-amber-400 font-mono">
+                      {emailAttachments.length} file(s) ({emailAttachments.map(a => a.name).join(", ")})
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs text-amber-300">
+                <strong>Notice:</strong> Emails will be sent using the official TEDx website dark/red visual template. Make sure your SMTP credentials are active.
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 pt-4 border-t border-white/10">
+                <button
+                  onClick={() => setShowSendConfirmModal(false)}
+                  disabled={isSendingEmail}
+                  className="w-full bg-transparent border border-white/20 hover:border-white text-white font-clash py-3 rounded-lg text-xs font-semibold uppercase transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleSendEmailBroadcast(false)}
+                  disabled={isSendingEmail}
+                  className="w-full bg-[#EB0028] hover:bg-[#c30020] text-white font-clash py-3 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  {isSendingEmail ? (
+                    <>
+                      <Loader2 size={14} className="animate-spin" />
+                      <span>Dispatching...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send size={14} />
+                      <span>Confirm & Send</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Email Delivery Result Modal */}
+      <AnimatePresence>
+        {emailSendResult && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md overflow-y-auto"
+            onClick={() => setEmailSendResult(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 10 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 10 }}
+              className="relative w-full max-w-md bg-zinc-950 border border-white/10 rounded-2xl p-6 md:p-8 shadow-2xl space-y-6 my-8 text-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setEmailSendResult(null)}
+                className="absolute top-6 right-6 text-white/50 hover:text-white hover:bg-white/10 p-2 rounded-full transition-colors cursor-pointer"
+              >
+                <X size={20} />
+              </button>
+
+              <div className="space-y-2">
+                {emailSendResult.success ? (
+                  <div className="w-12 h-12 bg-emerald-500/10 border border-emerald-500/30 rounded-full flex items-center justify-center text-emerald-400 mx-auto">
+                    <Check size={24} />
+                  </div>
+                ) : (
+                  <div className="w-12 h-12 bg-red-500/10 border border-red-500/30 rounded-full flex items-center justify-center text-red-400 mx-auto">
+                    <AlertCircle size={24} />
+                  </div>
+                )}
+                
+                <h3 className="text-xl font-orbitron font-bold text-white">
+                  {emailSendResult.success ? "Broadcast Complete" : "Broadcast Failed"}
+                </h3>
+                <p className="text-xs text-white/60 font-clash leading-relaxed">
+                  {emailSendResult.message}
+                </p>
+              </div>
+
+              {emailSendResult.errors && emailSendResult.errors.length > 0 && (
+                <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-left max-h-40 overflow-y-auto text-[11px] font-mono space-y-1">
+                  <div className="font-bold text-red-400">Failed Deliveries:</div>
+                  {emailSendResult.errors.map((err, i) => (
+                    <div key={i} className="text-red-300">
+                      {err.email}: {err.error}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <button
+                onClick={() => setEmailSendResult(null)}
+                className="w-full bg-[#EB0028] hover:bg-[#c30020] text-white font-clash py-3 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
+              >
+                Close Summary
+              </button>
             </motion.div>
           </motion.div>
         )}
