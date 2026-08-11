@@ -15,8 +15,6 @@ const Hero = ({ startAnimation, onComplete }: { startAnimation: boolean; onCompl
   const subtitleRef = useRef<HTMLDivElement>(null);
   const headRef = useRef<HTMLDivElement>(null);
   const infoRef = useRef<HTMLDivElement>(null);
-  const bookingRef = useRef<HTMLDivElement>(null);
-  const ticketRef = useRef<HTMLDivElement>(null);
   const gradientRef = useRef<HTMLImageElement>(null);
   const containerRef = useRef<HTMLElement>(null);
 
@@ -26,8 +24,6 @@ const Hero = ({ startAnimation, onComplete }: { startAnimation: boolean; onCompl
   const mobileHeadRef = useRef<HTMLDivElement>(null);
   const mobileGradientRef = useRef<HTMLImageElement>(null);
   const mobileInfoRef = useRef<HTMLDivElement>(null);
-  const mobileBookingRef = useRef<HTMLDivElement>(null);
-  const mobileTicketRef = useRef<HTMLSpanElement>(null);
 
   const tlRef = useRef<gsap.core.Timeline | null>(null);
 
@@ -44,8 +40,6 @@ const Hero = ({ startAnimation, onComplete }: { startAnimation: boolean; onCompl
     const subtitleTargets = [subtitleRef.current, mobileSubtitleRef.current].filter(Boolean);
     const headTargets = [headRef.current, mobileHeadRef.current].filter(Boolean);
     const infoTargets = [infoRef.current, mobileInfoRef.current].filter(Boolean);
-    const bookingTargets = [bookingRef.current, mobileBookingRef.current].filter(Boolean);
-    const ticketTargets = [ticketRef.current, mobileTicketRef.current].filter(Boolean);
 
     tl.fromTo(titleTargets,
       { clipPath: "inset(0 0 100% 0)" },
@@ -112,34 +106,6 @@ const Hero = ({ startAnimation, onComplete }: { startAnimation: boolean; onCompl
           clipPath: "inset(0 0 0% 0)",
           y: 0,
           duration: 1,
-          ease: "power3.out"
-        },
-        "<"
-      )
-      .fromTo(bookingTargets,
-        {
-          opacity: 0,
-          y: -20
-        },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 1.5,
-          ease: "power3.out"
-        },
-        "<"
-      )
-      .fromTo(ticketTargets,
-        {
-          clipPath: "inset(0 100% 0 0)",
-          opacity: 0,
-          x: 30
-        },
-        {
-          clipPath: "inset(0 0% 0 0)",
-          opacity: 1,
-          x: 0,
-          duration: 1.5,
           ease: "power3.out"
         },
         "<"
@@ -220,18 +186,6 @@ const Hero = ({ startAnimation, onComplete }: { startAnimation: boolean; onCompl
               2026
             </p>
           </div>
-          <div className="flex flex-col items-end gap-2 pointer-events-auto" ref={bookingRef}>
-            <span className="text-sm font-light tracking-[-0.02em]" ref={ticketRef}>tickets here!</span>
-            <Link href="/tickets">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="relative bg-[#EB0028] hover:bg-[#B71C1C] text-white font-clash font-normal text-[14px] leading-[100%] tracking-[-0.02em] py-4 px-8 transition-colors duration-300 z-[100] cursor-pointer whitespace-nowrap"
-              >
-                BOOK NOW
-              </motion.button>
-            </Link>
-          </div>
         </div>
       </div>
 
@@ -292,20 +246,6 @@ const Hero = ({ startAnimation, onComplete }: { startAnimation: boolean; onCompl
               AUG<br />
               2026
             </p>
-          </div>
-
-          {/* Book Button */}
-          <div className="flex flex-col items-end gap-1 pointer-events-auto" ref={mobileBookingRef}>
-            <span className="text-xs font-light tracking-[-0.02em]" ref={mobileTicketRef}>tickets here!</span>
-            <Link href="/tickets">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="relative bg-[#EB0028] hover:bg-red-900 text-white font-medium py-2.5 px-6 transition-colors duration-300 z-[100] cursor-pointer"
-              >
-                BOOK NOW
-              </motion.button>
-            </Link>
           </div>
         </div>
       </div>

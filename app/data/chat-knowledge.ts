@@ -136,7 +136,7 @@ export const knowledgeBase: KnowledgeEntry[] = [
     triggers: ["ticket", "price", "cost", "buy", "book", "register", "fee"],
     patterns: [/how much (is|are|does)/i, /ticket (price|cost|fee)/i, /buy.*ticket/i, /book.*(now|ticket)/i, /(student|attendee|faculty).*(price|cost)/i, /purchase/i, /registration/i],
     response:
-      "Here are the ticket prices (Total capacity is strictly limited to 100 seats):\n• **Impact College Students**: ₹499 (valid USN required)\n• **Attendees & Faculty**: ₹500\n\nBook your tickets on the tickets page: /tickets",
+      "Online ticket registration for TEDxICEAS 2026 is currently closed.",
     priority: 5,
   },
   {
@@ -145,7 +145,7 @@ export const knowledgeBase: KnowledgeEntry[] = [
     triggers: ["student ticket", "student discount", "student price", "impact college student"],
     patterns: [/student.*(ticket|price|discount)/i, /(is there|any) student/i, /impact college.*student/i],
     response:
-      "Yes! Impact College Student tickets are **₹499**. You will need a valid USN to register. Book here: /tickets",
+      "Ticket registration is currently closed.",
     priority: 2,
   },
   {
@@ -154,7 +154,7 @@ export const knowledgeBase: KnowledgeEntry[] = [
     triggers: ["attendees ticket", "faculty ticket", "professional", "general access"],
     patterns: [/attendee.*(ticket|price)/i, /faculty.*(ticket|price)/i, /professional.*ticket/i, /general.*access/i],
     response:
-      "Attendee & Faculty tickets are **₹500**. Book here: /tickets",
+      "Ticket registration is currently closed.",
     priority: 2,
   },
   {
@@ -163,7 +163,7 @@ export const knowledgeBase: KnowledgeEntry[] = [
     triggers: ["sold out", "available", "availability", "limit", "capacity"],
     patterns: [/sold out/i, /still available/i, /any tickets left/i, /seat limit/i, /capacity/i],
     response:
-      "TEDxICEAS 2026 has a strict venue capacity limit of **100 seats only**. Check real-time availability and book your pass here: /tickets",
+      "TEDxICEAS 2026 has a strict venue capacity limit of **100 seats only**. Online registration is currently closed.",
     priority: 2,
   },
   {

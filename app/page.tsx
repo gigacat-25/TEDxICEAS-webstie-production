@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "TEDxICEAS 2026 | What shapes us? | Official TEDx Event Bengaluru",
     description:
-      "Join TEDxICEAS 2026 at Visvesvaraya Auditorium, Impact College of Engineering, Sahakar Nagar, Bengaluru. Book your passes today!",
+      "Join TEDxICEAS 2026 at Visvesvaraya Auditorium, Impact College of Engineering, Sahakar Nagar, Bengaluru.",
     url: "https://tedxiceas.com",
     siteName: "TEDxICEAS",
     images: [
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "TEDxICEAS 2026 | What shapes us?",
-    description: "Join TEDxICEAS 2026 at Visvesvaraya Auditorium, Bengaluru. Book your passes today!",
+    description: "Join TEDxICEAS 2026 at Visvesvaraya Auditorium, Bengaluru.",
     images: ["https://tedxiceas.com/logo-white.png"],
   },
 };

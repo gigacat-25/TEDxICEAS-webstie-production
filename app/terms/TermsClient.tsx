@@ -39,15 +39,6 @@ export default function TermsAndPrivacyPage() {
             <span className="font-clash text-sm tracking-wide">Back to Home</span>
           </motion.div>
         </Link>
-        <Link href="/tickets">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="bg-[#EB0028] hover:bg-[#c30020] text-white font-orbitron font-bold text-xs uppercase tracking-wider py-2 px-6 rounded-full transition cursor-pointer shadow-lg hover:shadow-[#EB0028]/20"
-          >
-            Book Tickets
-          </motion.button>
-        </Link>
       </div>
 
       {/* Main Content */}

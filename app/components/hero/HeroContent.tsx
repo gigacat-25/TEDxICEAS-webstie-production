@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Link from "next/link";
 
 const textReveal = (delay: number) => ({
   initial: { clipPath: "inset(0 0 100% 0)" },
@@ -70,22 +69,6 @@ export default function HeroContent() {
         January 31, 2026 — Bengaluru
       </motion.p>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 6.5, ease: "easeOut" }}
-        className="mt-6 pointer-events-auto"
-      >
-        <Link href="/tickets">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="bg-[#EB0028] hover:bg-[#B71C1C] text-white font-clash font-normal text-sm py-3 px-8 transition-colors duration-300 cursor-pointer"
-          >
-            BOOK NOW
-          </motion.button>
-        </Link>
-      </motion.div>
 
       <motion.div
         initial={{ opacity: 0 }}

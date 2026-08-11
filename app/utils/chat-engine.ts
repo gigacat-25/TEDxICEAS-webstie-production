@@ -60,7 +60,7 @@ function getFallbackResponse(input: string): string {
     return "I'm not sure I understand. Try asking me about the event, speakers, tickets, venue, or contact info!"
   }
 
-  return "I'm not sure about that yet, but I can help you with:\n\n• **Event info** — date, venue, theme \"What shapes us?\"\n• **Speakers** — who's speaking, their bios\n• **Tickets** — pricing (Impact College Students ₹499 / Attendees & Faculty ₹500)\n• **Venue** — location, parking\n• **Contact** — email, social media\n\nWhat would you like to know?"
+  return "I'm not sure about that yet, but I can help you with:\n\n• **Event info** — date, venue, theme \"What shapes us?\"\n• **Speakers** — who's speaking, their bios\n• **Venue** — location, parking\n• **Contact** — email, social media\n\nWhat would you like to know?"
 }
 
 export function findBestMatch(input: string): MatchResult | null {

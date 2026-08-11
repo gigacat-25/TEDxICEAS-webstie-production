@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion, AnimatePresence, useScroll, useMotionValueEvent, Variants } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import { useTheme } from "./ThemeContext";
 import { useCoreMetrics } from "./ThemeMetrics";
 import { useAuth } from "@clerk/nextjs";
@@ -33,8 +33,6 @@ const Navbar = ({ startAnimation = true }: { startAnimation?: boolean }) => {
   const pathname = usePathname();
   const { isSignedIn } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showBookBtn, setShowBookBtn] = useState(false);
-  const { scrollY } = useScroll();
   const { theme, toggleTheme } = useTheme();
 
   const currentNavLinks = [
@@ -53,15 +51,6 @@ const Navbar = ({ startAnimation = true }: { startAnimation?: boolean }) => {
   ];
 
   if (pathname === "/team") return null;
-
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    // Show button after scrolling past 80vh
-    if (latest > window.innerHeight * 0.8 && !showBookBtn) {
-      setShowBookBtn(true);
-    } else if (latest <= window.innerHeight * 0.8 && showBookBtn) {
-      setShowBookBtn(false);
-    }
-  });
 
   useEffect(() => {
     if (isMenuOpen) {
@@ -181,24 +170,6 @@ const Navbar = ({ startAnimation = true }: { startAnimation?: boolean }) => {
               </svg>
             )}
           </button>
-
-          {/* Book Now Button (appears on scroll) */}
-          <motion.div
-            className="overflow-hidden"
-            initial={{ width: 0, opacity: 0, marginLeft: 0 }}
-            animate={showBookBtn ? { width: "auto", opacity: 1, marginLeft: "2rem" } : { width: 0, opacity: 0, marginLeft: 0 }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
-          >
-            <Link href="/tickets">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="relative bg-[#EB0028] hover:bg-[#B71C1C] text-white font-clash font-normal text-[14px] leading-[100%] tracking-[-0.02em] py-4 px-8 transition-colors duration-300 z-[100] cursor-pointer whitespace-nowrap"
-              >
-                BOOK NOW
-              </motion.button>
-            </Link>
-          </motion.div>
         </div>
       </motion.nav>
 
@@ -274,20 +245,6 @@ const Navbar = ({ startAnimation = true }: { startAnimation?: boolean }) => {
                     {theme === "dark" ? "Light Mode" : "Dark Mode"}
                   </span>
                 </button>
-              </motion.div>
-
-              {/* Bottom Section */}
-              <motion.div variants={menuItemVariants} custom={5}>
-                <p className="text-gray-400 text-sm font-clash pb-1">Join the experience!</p>
-                <Link href="/tickets" onClick={() => setIsMenuOpen(false)}>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="w-full bg-[#EB0028] text-white font-clash font-bold py-6 text-3xl tracking-wider hover:bg-[#c00020] transition-colors uppercase"
-                  >
-                    Book Now
-                  </motion.button>
-                </Link>
               </motion.div>
             </div>
 

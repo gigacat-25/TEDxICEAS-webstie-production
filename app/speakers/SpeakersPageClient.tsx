@@ -330,13 +330,6 @@ export default function SpeakersPageClient() {
               Join us on August 10, 2026 at Visvesvaraya Auditorium, Impact College of Engineering, Bengaluru.
             </p>
           </div>
-
-          <Link
-            href="/tickets"
-            className="shrink-0 inline-flex items-center gap-2 px-8 py-4 bg-[#EB0028] text-white font-clash text-sm font-semibold tracking-wide rounded-xl hover:bg-[#B71C1C] transition-all transform hover:scale-[1.03] shadow-lg shadow-[#EB0028]/25"
-          >
-            Book Your Passes <ChevronRight className="w-4 h-4" />
-          </Link>
         </div>
 
         {/* Back to Home */}
@@ -428,15 +421,6 @@ export default function SpeakersPageClient() {
                       </div>
                     </div>
                   )}
-                </div>
-
-                <div className="pt-6 border-t border-white/10 flex items-center justify-between">
-                  <Link
-                    href="/tickets"
-                    className="px-6 py-3 bg-[#EB0028] text-white font-clash text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-[#B71C1C] transition-colors"
-                  >
-                    See {activeSpeaker.name.split(" ")[0]} Live
-                  </Link>
                 </div>
               </div>
             </motion.div>

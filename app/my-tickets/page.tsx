@@ -76,14 +76,14 @@ export default function MyTicketsPage() {
 
       {/* Header controls (Screen-only, hidden in print) */}
       <div className="relative z-10 w-full px-6 md:px-12 py-8 flex items-center justify-between print:hidden">
-        <Link href="/tickets">
+        <Link href="/">
           <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/20 text-white/80 hover:text-white hover:border-[#EB0028] transition bg-black/50 backdrop-blur-md cursor-pointer"
           >
             <ArrowLeft size={16} />
-            <span className="font-clash text-sm tracking-wide">Back to Booking</span>
+            <span className="font-clash text-sm tracking-wide">Back to Home</span>
           </motion.div>
         </Link>
         <div className="flex items-center gap-4">
@@ -134,14 +134,14 @@ export default function MyTicketsPage() {
           <div className="bg-zinc-950/50 border border-white/10 p-8 rounded-2xl text-center max-w-md w-full space-y-6 backdrop-blur-md">
             <TicketIcon className="mx-auto text-white/30" size={48} />
             <div className="space-y-2">
-              <h3 className="font-orbitron font-bold text-xl text-white">No Tickets Booked Yet</h3>
+              <h3 className="font-orbitron font-bold text-xl text-white">No Tickets Found</h3>
               <p className="font-clash text-sm text-white/50 leading-relaxed">
-                You haven&apos;t registered for any TEDxICEAS passes yet. Purchase one to secure your seat.
+                You haven&apos;t registered for any TEDxICEAS passes under this account.
               </p>
             </div>
-            <Link href="/tickets">
+            <Link href="/">
               <button className="w-full bg-[#EB0028] hover:bg-[#c30020] text-white py-3 rounded-lg font-clash font-semibold uppercase tracking-wider transition-colors cursor-pointer mt-2">
-                Book Tickets Now
+                Back to Home
               </button>
             </Link>
           </div>
